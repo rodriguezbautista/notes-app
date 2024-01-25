@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../hooks/useSession";
+import url from '../utils/apiUrl'
 
 export default function LoginPage () {
   const [loginError, setLoginError] = useState('');
@@ -10,7 +11,6 @@ export default function LoginPage () {
   const navigate = useNavigate();
 
   async function login(username, password){
-    const url = process.env.REACT_APP_API_URL
 
     await fetch(url + '/login', {
       method: 'POST',

@@ -2,10 +2,11 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@ne
 import { NotesService } from '../services/notes.service';
 import { Response, Request } from 'express'
 import { Prisma } from '@prisma/client';
+import { CategoriesService } from 'src/services/categories.service';
 
 @Controller('/notes')
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}
+  constructor(private readonly notesService: NotesService, private readonly categoriesService: CategoriesService) {}
 
   @Get()
   async userNotes(@Req() request: Request, @Res() response: Response): Promise<Response | null> {
@@ -14,7 +15,6 @@ export class NotesController {
       const notes = await this.notesService.getNotes({ authorId: user });
       
       if(notes){
-        notes.sort((a, b) => (a.lastModified > b.lastModified)? -1: 1)
         return response.json(notes);
       }
  
@@ -29,7 +29,7 @@ export class NotesController {
   async postNote(@Req() request: Request, @Body() body: Prisma.NotesCreateInput, @Res() response: Response): Promise<Response | null>{
     try{
       body['authorId'] = request.cookies.user
-      const note = await this.notesService.createNotes(body);
+      const note = await this.notesService.createNote(body);
 
       if(note){
         return response.status(201).json(note)
@@ -44,19 +44,55 @@ export class NotesController {
   }
   
   @Patch('/:id')
-  async edit(@Body() body: Prisma.NotesUpdateInput, @Param('id') id: string, @Res() response: Response): Promise<Response | null>{
+  async edit(@Body() body: Prisma.NotesUpdateInput | any, @Param('id') id: string, @Res() response: Response): Promise<Response | null>{
     try{
-      const { content, isArchived, categories } = body
+      const { content, status, categories } = body
+      
 
-      const post = await this.notesService.updateNotes({
+      /* Cannot make the following code because clientside categories doesn't have an id and therefore cannot be compared to db categories
+        notesService.update({
+          categories: {
+            upsert: {
+              ...
+            }
+          }
+        }) 
+      */
+     
+
+      let newCategories 
+      if (categories){
+        const currentCategories = await this.categoriesService.getCategories({
+          where: {
+            noteId: Number(id)
+          }
+        });
+
+        newCategories = categories.filter(c => !currentCategories.some(curr => curr.category === c.category));
+  
+        const erasedCategories = currentCategories.filter(c => !categories.some(curr => curr.category === c.category));
+        
+        erasedCategories.forEach(async category => {
+          await this.categoriesService.deleteCategory({
+              id: category.id
+            } 
+          )
+        });
+      }
+
+
+
+      const post = await this.notesService.updateNote({
+        data: {
+          content,
+          status,
+          categories: {
+            create: newCategories?.map(c => {return { "category": c.category }})
+          }
+        },
         where: {
           id: Number(id)
         },
-        data: {
-          content,
-          isArchived,
-          categories
-        }
       });
 
       return response.json(post)
@@ -70,7 +106,7 @@ export class NotesController {
   @Delete('/:id')
   async delete(@Param('id') id: string, @Res() response: Response): Promise<Response | null>{
     try{
-      await this.notesService.deleteNotes({
+      await this.notesService.deleteNote({
         id: Number(id)
       })
       return response.status(204).send()
@@ -79,4 +115,4 @@ export class NotesController {
       return response.status(500).json(err)
     }
   }
-} 
+}

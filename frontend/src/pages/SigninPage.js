@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Form, redirect } from "react-router-dom";
+import url from '../utils/apiUrl'
 
 export default function SigninPage(){
   const [registerError, setRegisterError] = useState('');
@@ -9,7 +10,6 @@ export default function SigninPage(){
   const [confirmPassword, setConfirmPassword] = useState('');
 
   async function signin(username, password){
-    const url = process.env.REACT_APP_API_URL
 
     await fetch(url + '/signin', {
       method: 'POST',

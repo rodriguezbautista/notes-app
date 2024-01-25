@@ -2,11 +2,11 @@ import { Link, Outlet } from 'react-router-dom';
 import './App.css';
 import { useSession } from './hooks/useSession';
 import { useEffect } from 'react';
+import url from './utils/apiUrl'
 
 function App() {
-  const [isLogged, setIsLogged] = useSession(false)
+  const [isLogged, setIsLogged] = useSession()
 
-  const url = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetch(url + '/validation', {
@@ -19,7 +19,7 @@ function App() {
         setIsLogged(true)
       })
       .catch(err => console.log(err));
-  }, [url, setIsLogged])
+  }, [setIsLogged])
 
   function logout(){
     fetch(url + '/logout', {
@@ -38,8 +38,7 @@ function App() {
   return (
     <>
       <header>
-        <nav>
-          <Link to='/' className='notes-btn'><h2>Home</h2></Link>
+        <nav className='header__navbar'>
           {
             !isLogged ? 
             <>

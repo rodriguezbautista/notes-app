@@ -1,12 +1,18 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useSession } from "../hooks/useSession";
-
-const url = process.env.REACT_APP_API_URL;
+import url from '../utils/apiUrl'
+import Note from "../components/Notes";
+import NoteModal from "../components/NoteModal";
+import { TailSpin } from 'react-loader-spinner'
 
 export default function NotesPage(){
+  const [filterState, setFilterState] = useState('all')
   const [noteList, setNoteList] = useState([]);
   const [addingNote, setAddingNote] = useState(false);
+  const [filterCategories, setFilterCategories] = useState([]);
+  const [filterText, setFilterText] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [isLogged] = useSession();
 
   useEffect(() => {
@@ -15,222 +21,140 @@ export default function NotesPage(){
     })
     .then(res => {
       if (!res.ok){
-        throw new Error('Not logged in')
+        throw new Error('Not logged in');
       }
       return res.json();
     })
-    .then(res => setNoteList(res))
+    .then(res => {
+      setNoteList(res);
+      setIsLoading(false);
+    })
     .catch((err) => {
       console.log(err);
+      setIsLoading(false)
       setNoteList([]);
-    })
+    });
   }, [isLogged]);
+
+  function changeFilterState(e, state){
+    e.preventDefault();
+    setFilterState(state);
+  }
   
   return (
-    <main className='notes__container container'>
-      {
-      isLogged ?
-        <>
-          <div className="notes__header">
-            <h1 className='notes__title'>Notes</h1>
-            <button 
-              className='notes__add-btn btn'
-              onClick={() => setAddingNote(true)}>
-              <img src='/add-note-icon.svg' alt='Add note icon' className='icon add-btn__icon'/>
-              <h2 className='add-btn__description'>Add Note</h2>
-            </button>
-          </div>
-          <ul className='notes'>
-            {!!noteList && noteList.map(({
-              id,
-              content,
-              lastModified
-            }) => <Note
-                    key={id}
-                    id={id}
-                    content={content}
-                    lastModified={lastModified}
-                    setNoteList={setNoteList}/>
-            )}
-          </ul>
-          <AddNoteModal 
-            addingNote={addingNote}
-            setAddingNote={setAddingNote} />
-        </>
-        :
-        <h1><Link to={'/login'} className="login-link">Login</Link> to use the app!</h1>
-      }
-    </main>
-  );
-}
-
-
-function Note({id, content, lastModified, setNoteList}){
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState(content)
-
-  async function submitEdit(){
-    try{
-      const response = await fetch(url + `/notes/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          content: editedText
-        })
-      });
-      if (response.ok){
-        setIsEditing(false);
-      }
-    } catch(err){
-      console.log(err);
-    }
-  }
-
-  async function deleteNote(){
-    try{
-      await fetch(url + `/notes/${id}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-      setNoteList(prev => prev.filter(note => note.id !== id))
-    } catch(err){
-      console.log(err);
-    }
-  }
-
-  const lastModifiedFormatted = new Date(lastModified).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-
-  const initialDisplay = 
-        <>
-          <p className='note__content'>{content}</p>
-          <div className='note__info'>
-            <h5 className='note__created-at'>Last modified: {lastModifiedFormatted}</h5>
-            <button
-              className='note__action btn'
-              onClick={() => setIsEditing(true)}>
-                <img src='/edit-icon.svg' alt='Note edit button' className='icon action__icon'/>
-                <span className='action__description'>Edit</span>
-            </button>
-            <button 
-              className='note__action btn'
-              onClick={async () => await deleteNote()}>
-                <img src='/delete-icon.svg' alt='Note delete button' className='icon action__icon'/>
-                <span className='action__description'>Delete</span>
-            </button>
-          </div>
-        </>
-
-
-  const editingDisplay = 
-    <form className="edit-form">
-      <textarea 
-        value={editedText} 
-        autoFocus={true} 
-        onChange={(e) => setEditedText(e.target.value)} 
-        className='note__content'
-        name="content"></textarea>
-      <div className='note__info'>
-        <h5 className='note__created-at'>Last modified: {lastModifiedFormatted}</h5>
-        <button
-          className='note__action btn'
-          type="submit"
-          disabled={content === editedText}
-          onClick={async (e) => {
-            e.preventDefault();
-            await submitEdit();
-            const lastModified = new Date();
-            setNoteList((prev) => {
-              return [{id, content: editedText, lastModified: lastModified.toISOString()}, ...prev.filter(note => note.id !== id)];
-            });
-          }}>
-          <img src='/check-icon.svg' alt='Submit edit button' className='icon action__icon'/>
-        </button>
-        <button
-          className='note__action btn'
-          type="submit"
-          onClick={() => setIsEditing(false)}>
-          <img src='/xmark-icon.svg' alt='Submit edit button' className='icon action__icon'/>
-        </button>
-      </div>
-    </form>
-
-  return (
-    <li>
-      <div className='note'>
+    <>
+    <main className='app'>
+      <section className='notes__container container'>
         {
-          !isEditing ?
-          initialDisplay :
-          editingDisplay
-        }
-      </div>
-    </li>
-  );
-}
-
-function AddNoteModal({addingNote, setAddingNote}){
-  const [content, setContent] = useState('');
-  const ref = useRef(null);
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (ref && ref.current){
-      ref.current.querySelector('form').focus();
-    }
-  },[addingNote]);
-
-  async function postNote(){
-    try{
-      await fetch(url + '/notes', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          content
-        }),
-      });
-      navigate(0)
-    } catch(err) {
-      console.log(err);
-    }
-  }
-
-  return(
-    addingNote &&
-    <div 
-      ref={ref}
-      tabIndex={0}
-      onBlur={(e) => {
-        if (e.currentTarget === e.relatedTarget){
-          setAddingNote(false)
-        }
-      }}
-      className="modal__container">
-        <form 
-          tabIndex={0}
-          className="modal__form">
-            <textarea 
-              value={content}
-              onChange={(e) => setContent(e.target.value)}/>
+          isLoading ?
+            <TailSpin 
+            visible={true}
+            height="160"
+            width="160"
+            color="#4fa94d"
+            ariaLabel="tail-spin-loading"
+            radius="1"
+            wrapperStyle={{"paddingTop": "20%", "margin": "auto"}}
+            wrapperClass=""/>
+          :
+        <>
+        {
+        isLogged ?
+          <>
+            <h1 className='notes__title'>Notes</h1>
+            <div className="notes__header">
+              <div className="notes__status">
+                <button 
+                  onClick={(e) => changeFilterState(e, "all")}
+                  className={filterState === "all" ? "active ": ""}
+                  id="All">All</button>
+                <button 
+                  onClick={(e) => changeFilterState(e, "active")}
+                  className={filterState === "active" ? "active ": ""}
+                  id="Active">Active</button>
+                <button 
+                  onClick={(e) => changeFilterState(e, "inactive")}
+                  className={filterState === "inactive" ? "active ": ""}
+                  id="Inactive">Unactive</button>
+                <button 
+                  onClick={(e) => changeFilterState(e, "archived")}
+                  className={filterState === "archived" ? "active ": ""}
+                  id="Archived">Archived</button>
+              </div>
+              <input
+                spellCheck={false}
+                className="notes__filter"
+                type="text"
+                placeholder="Add category filters!..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)} 
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && filterText && !filterCategories.includes(filterText)){
+                    setFilterCategories(prev => [...prev, filterText])
+                    setFilterText('');
+                  }
+                }}/>
+                <ul className="filters">
+                  {
+                    filterCategories.map(filter => {
+                      return(
+                        <li key={filter} className="filer">
+                          <button
+                            className="filter-btn"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setFilterCategories(prev => prev.filter(category => category !== filter));
+                            }}>
+                            <span>{filter}</span>
+                            <img src="/xmark-icon.svg" alt="Delete category" className="icon action__icon"/>
+                          </button>
+                        </li>
+                      )
+                    })
+                  }
+                </ul>
+            </div>
+            <ul className='notes'>
+              {!!noteList &&
+              noteList.filter(note => filterState==="all" || note.status === filterState).filter(note => !filterCategories.length || note.categories.some(category => filterCategories.includes(category))).map(({
+                id,
+                content,
+                lastModified,
+                categories,
+                status
+              }) => {
+                  return <div key={id} className="note__wrapper">
+                    <Note
+                      id={id}
+                      content={content}
+                      lastModified={lastModified}
+                      categories={categories}
+                      setNoteList={setNoteList}
+                      status={status}/>
+                  </div>
+              })
+            }
+            </ul>
             <button 
-            className="btn"
-            onClick={async (e) => {
-              e.preventDefault()
-              await postNote()
-            }}>
-              <h2>Create</h2>
+              className='btn primary-btn notes__add-btn'
+              onClick={() => setAddingNote(true)}>
+              <img src='/add-note-icon.svg' alt='Add note icon' className='icon notes__add-btn__icon'/>
+              Add Note
             </button>
-        </form>
-    </div>
-  )
+          </>
+          :
+          <div className="hero__wrapper">
+            <h1 className="hero__header">Welcome to NoteApp <br/>
+            <Link to={'/login'} className="login-link">Join us</Link> and start using the app!</h1>
+          </div>
+        }
+        </>
+      }
+      </section>
+    </main>
+    <NoteModal
+      addingNote={addingNote}
+      setAddingNote={setAddingNote} />
+  </>
+  );
 }

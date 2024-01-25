@@ -10,7 +10,7 @@ datasource db {
 model Notes {
   id           Int          @id @default(autoincrement())
   content      String
-  isArchived   Boolean?     @default(false)
+  status       String?      @default(dbgenerated("'active'::text"))
   lastModified DateTime     @updatedAt
   authorId     String       @db.VarChar(30)
   user         Users        @relation(fields: [authorId], references: [username])
@@ -19,13 +19,16 @@ model Notes {
 
 model Users {
   username     String @id @db.VarChar(30)
-  email    String @unique
-  password String
-  notes    Notes[]
+  email        String @unique
+  password     String
+  notes        Notes[]
 }
 
 model Categories {
-  category   String @id
-  noteId Int
-  note   Notes  @relation(fields: [noteId], references: [id])
+  id       Int    @id @default(autoincrement())
+  category String
+  noteId   Int
+  note     Notes  @relation(fields: [noteId], references: [id])
+
+  @@unique([category, noteId])
 }

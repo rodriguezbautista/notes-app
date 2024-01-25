@@ -18,14 +18,22 @@ export class NotesService{
     notesWhereInput: Prisma.NotesWhereInput
   ): Promise<Notes[] | null> {
     return this.prisma.notes.findMany({
+      where: notesWhereInput,
       include: {
-        user: true
-      },
-      where: notesWhereInput
-    })
+        categories: {
+          select: {
+            category: true
+          }
+        },
+      }
+    }).then(res => 
+      res.map(note => {
+        return {...note, categories: note.categories.map(c => c.category)}
+      })
+        .sort((a, b) => (a.lastModified > b.lastModified)? -1: 1));
   }
 
-  async createNotes(
+  async createNote(
     data: Prisma.NotesCreateInput
   ): Promise<Notes> {
     return this.prisma.notes.create({
@@ -33,18 +41,24 @@ export class NotesService{
     })
   }
 
-  async updateNotes(params: {
+  async updateNote(params: {
     where: Prisma.NotesWhereUniqueInput;
     data: Prisma.NotesUpdateInput;
   }): Promise<Notes> {
     const { where, data } = params;
+
     return this.prisma.notes.update({
       data,
       where,
     });
   }
 
-  async deleteNotes(where: Prisma.NotesWhereUniqueInput): Promise<Notes> {
+  async deleteNote(where: Prisma.NotesWhereUniqueInput): Promise<Notes> {
+    await this.prisma.categories.deleteMany({
+      where: {
+        noteId: where.id
+      }
+    })
     return this.prisma.notes.delete({
       where,
     });

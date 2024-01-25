@@ -9,12 +9,13 @@ import { NotesService } from './services/notes.service';
 import { ValidationService } from './services/validation.service';
 import { ValidationMiddleware } from './middlewares/validation.middleware';
 import { LogoutController } from './controllers/logout.controller';
+import { CategoriesService } from './services/categories.service';
  
 
 @Module({
   imports: [],
   controllers: [NotesController, LoginController, SigninController, LogoutController, ValidationController],
-  providers: [PrismaService, UserService, NotesService, ValidationService],
+  providers: [PrismaService, UserService, NotesService, ValidationService, CategoriesService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
