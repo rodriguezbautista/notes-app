@@ -43,7 +43,7 @@ export class NotesService{
 
   async updateNote(params: {
     where: Prisma.NotesWhereUniqueInput;
-    data: Prisma.NotesUpdateInput;
+    data: Prisma.NotesUpdateInput; 
   }): Promise<Notes> {
     const { where, data } = params;
 

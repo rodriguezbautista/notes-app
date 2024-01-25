@@ -25,6 +25,7 @@ NODE_PID_1=$!
 echo "DATABASE_URL=\"postgresql://rodriguezbautista:yQY7MuiphBd4@ep-orange-fog-a5hu0nrc-pooler.us-east-2.aws.neon.tech/notesdb?sslmode=require&pgbouncer=true\"" > .env
 echo "JWT_SECRET=\"efcf99d4-a220-4840-9f6c-4346cc61a39a\"" >> .env
 echo "DIRECT_URL=\"postgresql://rodriguezbautista:yQY7MuiphBd4@ep-orange-fog-a5hu0nrc.us-east-2.aws.neon.tech/notesdb?sslmode=require\"" >> .env
+echo "ACCEPTED_DOMAINS=\"http://localhost:3000\"" >> .env
 
 # Run npm start for backend
 npm run start:dev &
