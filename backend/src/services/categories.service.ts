@@ -6,9 +6,10 @@ import { Categories, Prisma } from "@prisma/client";
 export class CategoriesService{
   constructor(private prisma: PrismaService) {}
 
-  async getCategories(
-    where: Prisma.CategoriesWhereInput
-  ): Promise<Categories[] | null>{
+  async getCategories(params: {
+    where: Prisma.CategoriesWhereInput;
+  }): Promise<Categories[] | null>{
+    const { where } = params
 
     return this.prisma.categories.findMany({
       include: {
