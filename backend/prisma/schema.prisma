@@ -10,24 +10,24 @@ datasource db {
 model Notes {
   id           Int          @id @default(autoincrement())
   content      String
-  status       String?      @default(dbgenerated("'active'::text"))
-  lastModified DateTime     @updatedAt
   authorId     String       @db.VarChar(30)
-  user         Users        @relation(fields: [authorId], references: [username])
+  lastModified DateTime     @updatedAt
+  status       String?      @default("active")
   categories   Categories[]
+  user         Users        @relation(fields: [authorId], references: [username])
 }
 
 model Users {
-  username     String @id @db.VarChar(30)
-  email        String @unique
-  password     String
-  notes        Notes[]
+  username String  @id @db.VarChar(30)
+  email    String  @unique
+  password String
+  notes    Notes[]
 }
 
 model Categories {
-  id       Int    @id @default(autoincrement())
   category String
   noteId   Int
+  id       Int    @id @default(autoincrement())
   note     Notes  @relation(fields: [noteId], references: [id])
 
   @@unique([category, noteId])

@@ -53,7 +53,7 @@ export class NotesService{
     });
   }
 
-  async deleteNote(where: Prisma.NotesWhereUniqueInput): Promise<Notes> {
+  async deleteNote(where: Prisma.NotesWhereUniqueInput | any): Promise<Notes> {
     await this.prisma.categories.deleteMany({
       where: {
         noteId: where.id
