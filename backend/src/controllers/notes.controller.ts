@@ -46,7 +46,6 @@ export class NotesController {
   @Patch('/:id')
   async edit(@Body() body: Prisma.NotesUpdateInput | any, @Param('id') id: string, @Res() response: Response): Promise<Response | null>{
     try{
-      const { content, status, categories } = body
       
 
       /* Cannot make the following code because clientside categories doesn't have an id and therefore cannot be compared to db categories
@@ -83,10 +82,10 @@ export class NotesController {
 
       const post = await this.notesService.updateNote({
         data: {
-          content,
-          status,
+          content: body.content,
+          status: body.status,
           categories: {
-            create: categories?.map(c => {return { "category": c.category }})
+            create: body.categories?.map(c => {return { "category": c.category }})
           }
         },
         where: {
