@@ -58,7 +58,7 @@ export default function LoginPage () {
         </label>
         {loginError ? <label>{loginError}</label> : null}
         <button 
-          className='submit-btn btn' 
+          className='primary' 
           onClick={async (e) => {
             e.preventDefault();
             onButtonClick();

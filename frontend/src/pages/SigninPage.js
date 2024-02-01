@@ -72,7 +72,7 @@ export default function SigninPage(){
         </label>
         {registerError ? <label>{registerError}</label> : null}
         <button 
-          className='submit-btn' 
+          className='primary' 
           type='submit' 
           disabled={!(email && username && password && confirmPassword)} 
           onClick={async (e) => {

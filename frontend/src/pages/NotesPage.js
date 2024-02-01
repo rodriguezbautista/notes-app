@@ -135,7 +135,9 @@ function NoteFilters({categoriesList, filteredState, setFilteredState, filteredC
 
   return(
     <>
-    <button onClick={openFilters}><img className="action__icon" src="/filter-icon.svg" alt="filter icon"/></button>
+    <button 
+      className="filter__button"
+      onClick={openFilters}><img className="action__icon" src="/filter-icon.svg" alt="filter icon"/></button>
     <div className="notes__header" ref={filtersRef}>
       <div className="notes__filter">
         <ul className="filter__list" style={{display: (!categoriesList.length) ? 'none': ''}}>
