@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, redirect } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import url from '../utils/apiUrl'
 
 export default function SigninPage(){
@@ -8,10 +8,10 @@ export default function SigninPage(){
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
   async function signin(username, password){
-
-    await fetch(url + '/signin', {
+    return await fetch(url + '/signin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -28,9 +28,12 @@ export default function SigninPage(){
   async function onButtonClick () {
     try {
       setRegisterError('')
-      await signin(username, password);
-      redirect('/login');
+      const response = await signin(username, password);
+      if (!response.ok)
+        throw new Error(await response.json());
+      navigate('/');
     } catch (err) {
+      console.log(err);
       setRegisterError(err.name + ' ' + err.message);
     }
   }
