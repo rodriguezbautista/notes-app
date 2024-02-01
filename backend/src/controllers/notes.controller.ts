@@ -60,7 +60,7 @@ export class NotesController {
       */
      
 
-      let newCategories 
+      /* let newCategories 
       if (categories){
         const currentCategories = await this.categoriesService.getCategories({
           where: {
@@ -73,11 +73,11 @@ export class NotesController {
         const erasedCategories = currentCategories.filter(c => !categories.some(curr => curr.category === c.category));
         
         erasedCategories.forEach(async category => {
-          await this.categoriesService.deleteCategory(
-              category.id
-            )
+          await this.categoriesService.deleteCategory({
+              id: category.id
+            })
         });
-      }
+      } */
 
 
 
@@ -86,7 +86,7 @@ export class NotesController {
           content,
           status,
           categories: {
-            create: newCategories?.map(c => {return { "category": c.category }})
+            create: categories?.map(c => {return { "category": c.category }})
           }
         },
         where: {
