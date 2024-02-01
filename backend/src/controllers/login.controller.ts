@@ -17,8 +17,8 @@ export class LoginController {
 
       if (user && password == user.password){
         const token = jwt.sign(username, process.env.JWT_SECRET, {})
-        response.appendHeader('Set-Cookie', `token=${token}; httponly`)
-        response.appendHeader('Set-Cookie', `user=${username}; httponly`)
+        response.appendHeader('Set-Cookie', `token=${token}; httponly; SameSite=None; Secure`)
+        response.appendHeader('Set-Cookie', `user=${username}; httponly; SameSite=None; Secure`)
         return response.send(user);
       }
 
