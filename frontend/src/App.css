@@ -35,22 +35,26 @@ button{
   font-size: unset;
   border: none;
   width: max-content;
+  text-wrap: nowrap;
+  padding: 0.5rem;
   
   &:hover{
     cursor: pointer;
-    opacity: 0.8;
   }
   
-  &.btn{
-    padding: 0.5rem;
+  &.primary{
     border-radius: 0.25rem;
     background-color: var(--primary);
     color: white;
+
+    &:hover{
+      opacity: 0.8;
+    }
   }
   
   &.primary-btn{
     font-size: 24px;
-  }
+  }  
 }
 
 textarea{
@@ -63,7 +67,6 @@ textarea{
   
   &:focus{
     outline: 1px solid grey;
-    border-color: grey;
   }
 }
 
@@ -87,6 +90,10 @@ header{
   justify-content: flex-end;
 }
 
+.header__title{
+  margin-right: auto;
+}
+
 .icon{
   filter: invert(100%);
   vertical-align: sub;
@@ -106,7 +113,7 @@ header{
   margin: auto;
 }
 
-.session-btn, .navbar-btn{
+.session-btn, .header__navbar > *{
   padding: 1rem; 
 }
 
@@ -116,27 +123,28 @@ header{
   max-width: var(--max-width);
   margin: auto;
   padding: 1rem;
+  gap: 1rem;
 }
 
 /* Notes */
 
 .notes__header{
   --cols: 3;
-  margin-block: 1rem;
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
+  display: none;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 1rem ;
-  align-items: center;
 
-  &::after{
-    content:"";
+
+  &.open{
+    display: flex;
   }
 }
 
 .notes__status{
   display: flex;
   width: max-content;
-  height: 100%;
 
   background-color: var(--background);
   border-radius: 2rem;
@@ -144,13 +152,11 @@ header{
   overflow: hidden;
 
   & button{
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     outline: 1px solid lightgrey;
     text-align: center;
     width: 100%;
-    &:hover{
-      background-color: var(--accent);
-    }
+    
     &:active{
       background-color: var(--accent);
       background-image: linear-gradient(rgb(0 0 0/10%) 0 0);      
@@ -163,28 +169,40 @@ header{
 }
 
 .notes__filter{
-  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter__input{
   width: 40ch;
   border-radius: 50vw;
 }
 
-.filters{
+.filter__list{
   display: flex;
   flex-wrap: wrap;
+  width: min-content;
+  gap: 0.5rem;
 }
 
-.filter-btn{
+.filter__wrapper{
   display: flex;
-  align-items: center;
-  width: max-content;
-  padding: 0.25rem 0.5rem;
-  background-color: var(--secondary);
-  border-radius: 50vw;
-  height: 100%;
 
-  & img{
-    filter: none;
-    width: 1.5rem;
+  & *{
+    text-wrap: nowrap;
+  }
+}
+
+.filter{
+  padding: 0.5rem;
+  background-color: lightgrey;
+  border-radius: 0.5rem;
+
+  &.active{
+    background-color: black;
+    color: white;
+    font-weight: bold;
   }
 }
 
@@ -192,11 +210,11 @@ header{
   --notes-max-width: 1408px;
   margin-inline: auto;
   display: flex;
-  justify-content: flex-start;
   flex-wrap: wrap;
   width: min(var(--notes-max-width, 458.67px), 100%);
-  
+
   padding-block: 1rem;
+
   gap: 1rem;
 }
 
@@ -221,66 +239,59 @@ header{
 .note{
   display: flex;
   flex-direction: column;
+  position: relative;
+  gap: 2rem;
+  padding: 0.5rem;
 
   border: 2px solid lightgrey;
-  border-radius: 0.75rem;
-
-  & > *{
-    padding: 0.5rem;
-  }
+  border-radius: 1rem;
 }
 
-.note__status__wrapper{
-  display: flex;
-  justify-content: space-between;
-}
-
-.note__status{
-  padding: 0.25rem 0.5rem;
-  background-color: var(--secondary);
-  width: min-content;
-  height: min-content;
-  border-radius: 100vw;
-}
-
-.note__options{
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem
-}
-
-.note__data{
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 0.25rem;
-  width: 100%;
-
-  & > *{
-    height: min-content;
-  }
-}
-
-.note__info{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 0.5rem;
-
-  height: 100%;
-  width: max-content;
+.note__actions-btn{
+  padding: 0.25rem 0.75rem;
+  margin-left: auto;
 }
 
 .note__actions{
+  position: absolute;
+  z-index: 10;
+  left: 100%;
+  top: -2px;
+  
+  visibility: hidden; 
+  overflow: hidden;
+  
   display: flex;
-  gap: 0.25rem;
+  flex-direction: column;
+  
+  margin-left: 1rem;
+  background-color: var(--background);
+  border: 2px solid lightgrey;
+  border-radius: 1rem;
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.3);
+
+
+  &.opened{
+    visibility: visible;
+  }
+
+  & button{
+    width: 100%;
+  }
+
+  & > :not(:last-child){
+    border-bottom: 2px solid lightgrey;
+  }
 }
 
 .note__action{
   display: flex;
+  justify-content: flex-start;
   gap: 0.25rem;
+
+  &:hover{
+    background-color: var(--accent);
+  }
 }
 
 .action__icon{
@@ -291,7 +302,6 @@ header{
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
 }
 
 .categories__list {
@@ -324,16 +334,39 @@ header{
 
 .note__content{
   width: 100%;
-  overflow: hidden;
-  border: none;
   border-radius: 0.75rem 0.75rem 0 0;
   border-bottom: 1px solid lightgrey;
-  font-size: 24px;
+  overflow: hidden;
 
-  &:focus{
-    border: none;
-    outline: 1px solid grey;
+  & > *{
+    padding: 0.5rem;
   }
+  
+  & > :not(.note__created-at){
+    font-size: 24px;
+    border: none;
+  }
+
+  & > textarea{
+    outline: solid 2px lightgrey;
+
+    &:focus{
+      outline: solid 2px grey;
+    }
+  }
+}
+
+.note__header{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  &::before{
+    content: "";
+  }
+}
+
+.note__created-at{
+  width: max-content;
 }
 
 /* Forms */
@@ -344,7 +377,7 @@ form{
 }
 
 .session__form, .modal__form{
-  width: min(480px, 100%);
+  width: 480px;
   margin: auto;
   padding: 1rem;
 
@@ -359,7 +392,7 @@ form{
   width: 100%;
 }
 
-input{
+input[type=text], input[type=password]{
   padding: 0.75rem 0.5rem;
   
   border: 1px solid grey;
@@ -378,30 +411,19 @@ input{
   gap: 0.5rem;
 }
 
-label{
+.form__label{
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-.close-btn__icon{
-  width: 2rem;
-}
-
 .modal__container{
-  position: absolute;
-  inset: 0;
+  margin: auto;
+  border: none;
+  border-radius: 1rem;
 
-  display: flex;
-  justify-content: center;
-
-  width: 100vw;
-  min-height: 100vh;
-
-  background-color: rgba(0,0,0,0.3);
-
-  & > *{
-    background-color: var(--background);
+  &::backdrop{
+    background-color: rgba(0, 0, 0, 0.3);
   }
 }
 

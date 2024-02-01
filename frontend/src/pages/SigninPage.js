@@ -38,7 +38,7 @@ export default function SigninPage(){
   return (
     <main className='container form-container'>
       <Form action="/signin" className='session__form'>
-        <label htmlFor='email'>
+        <label className="form__label" htmlFor='email'>
           Email
           <input
               type='text'
@@ -46,7 +46,7 @@ export default function SigninPage(){
               value= {email}
               onChange={e => setEmail(e.target.value)}/>
         </label>
-        <label htmlFor='username'>
+        <label className="form__label" htmlFor='username'>
           Username
           <input
               type='text'
@@ -54,7 +54,7 @@ export default function SigninPage(){
               value= {username}
               onChange={e => setUsername(e.target.value)}/>
         </label>
-        <label htmlFor='password'>
+        <label className="form__label" htmlFor='password'>
           Password
           <input
               type='password'
@@ -62,7 +62,7 @@ export default function SigninPage(){
               value= {password}
               onChange={e => setPassword(e.target.value)}/>
         </label>
-        <label htmlFor='confirm-password'>
+        <label className="form__label" htmlFor='confirm-password'>
           Confirm Password
           <input
               type='password'

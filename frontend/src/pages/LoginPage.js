@@ -40,7 +40,7 @@ export default function LoginPage () {
   return (
     <main className='container form-container'>
       <form className='session__form'>
-        <label htmlFor='username'>
+        <label className="form__label" htmlFor='username'>
           Username
           <input
               type='text'
@@ -48,7 +48,7 @@ export default function LoginPage () {
               value= {username}
               onChange={e => setUsername(e.target.value)}/>
         </label>
-        <label htmlFor='password'>
+        <label className="form__label" htmlFor='password'>
           Password
           <input
               type='password'

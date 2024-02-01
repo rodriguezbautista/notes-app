@@ -39,6 +39,7 @@ function App() {
     <>
       <header>
         <nav className='header__navbar'>
+          <h2 className='header__title'>Notes</h2>
           {
             !isLogged ? 
             <>

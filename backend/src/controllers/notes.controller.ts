@@ -73,10 +73,9 @@ export class NotesController {
         const erasedCategories = currentCategories.filter(c => !categories.some(curr => curr.category === c.category));
         
         erasedCategories.forEach(async category => {
-          await this.categoriesService.deleteCategory({
-              id: Number(category.id)
-            } 
-          )
+          await this.categoriesService.deleteCategory(
+              Number(category.id)
+            )
         });
       }
 
@@ -97,7 +96,7 @@ export class NotesController {
 
       return response.json(post)
 
-    } catch(err){
+    } catch(err){ 
       console.log(err);
       return response.status(500).json(err)
     }

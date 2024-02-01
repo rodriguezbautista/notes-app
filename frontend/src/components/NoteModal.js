@@ -1,21 +1,54 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../utils/apiUrl";
 import Categories from "./Categories";
+import useAutosizeTextArea from "../hooks/useAutoResize";
 
-export default function NoteModal({addingNote, setAddingNote}){
-  const [content, setContent] = useState('');
-  const [categories, setCategories] = useState([]);
+export default forwardRef(function NoteModal({id, categories = [], content = '', editing = false}, ref){
+  const [editedText, setEditedText] = useState(content);
+  const [editedCategories, setEditedCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const ref = useRef(null);
+  const textAreaRef = useRef(null)
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (ref && ref.current){
-      ref.current.querySelector('form').focus();
-    }
-  },[addingNote]);
+  useAutosizeTextArea(textAreaRef.current, editedText);
+  
+    useEffect(() => {
+      if (ref && ref.current){
+        ref.current.querySelector('form').focus();
+      }
+    },[ref]);
+  
+    useEffect(() => {
+      if (textAreaRef.current){
+        textAreaRef.current.focus();
+        textAreaRef.current.setSelectionRange(-1, -1);
+      }
+    },[textAreaRef])
 
+  async function editNote(){
+    try{
+      setIsLoading(true);
+      const response = await fetch(url + `/notes/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          content: editedText,
+          categories: editedCategories.map(c => {return {"category": c}})
+        })
+      });
+      setIsLoading(false);
+      if (response.ok){
+        navigate(0);
+      }
+    } catch(err){
+      console.log(err);
+    }
+  }
+  
   async function postNote(){
     try{
       setIsLoading(true);
@@ -26,7 +59,7 @@ export default function NoteModal({addingNote, setAddingNote}){
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          content,
+          content: editedText,
           categories: {
             create: categories.map(c => {return {"category": c}})
           }
@@ -39,15 +72,18 @@ export default function NoteModal({addingNote, setAddingNote}){
     };
   };
 
+  function compareCategories(categories, localCategories){
+    return categories.length === localCategories.length &&
+           categories.every((c) => localCategories.includes(c))
+  }
+
   return(
-    addingNote &&
-    <div 
+    <dialog 
       ref={ref}
-      tabIndex={0}
       onBlur={(e) => {
-        if (e.currentTarget === e.relatedTarget){
-          setAddingNote(false)
-        }
+        if (ref.current)
+          if (e.currentTarget === e.relatedTarget)
+            ref.current.close()
       }}
       className="modal__container">
         <form 
@@ -56,26 +92,52 @@ export default function NoteModal({addingNote, setAddingNote}){
             <h2>New Note</h2>
             <textarea 
               spellCheck={false}
-              value={content}
+              value={editedText}
               rows={3}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => setEditedText(e.target.value)}
               />
             <div className="note__info">
               <Categories
                 categories={categories}
-                setCategories={setCategories}
+                setCategories={setEditedCategories}
                 edit={true} 
                 modal={true}/>
-              <button 
-                className="btn"
-                disabled={isLoading || !content}
-                onClick={async () => {
-                  await postNote();
-                }}>
-                Create
-              </button>
+              {
+                !editing ?
+                <button 
+                  className="primary"
+                  disabled={isLoading || !editedText}
+                  onClick={async () => {
+                    await postNote();
+                  }}>
+                  Create
+                </button>
+                :
+                <>
+                  <button
+                    className='note__action primary'
+
+                    // button is only disabled when content and category list hasnt changed
+                    disabled={(content === editedText && compareCategories(categories, editedCategories)) || isLoading}
+                    onClick={async () => {
+                      await editNote();
+                    }}>
+                    Save
+                    <img src='/check-icon.svg' alt='Submit edit button' className='icon action__icon'/>
+                  </button>
+                  <button
+                    className='note__action primary'
+                    type="submit"
+                    onClick={() => {
+                      setEditedText(content);
+                    }}>
+                    Cancel
+                    <img src='/xmark-icon.svg' alt='Submit edit button' className='icon action__icon'/>
+                  </button>
+                </>
+              }
             </div>
         </form>
-    </div>
+    </dialog>
   )
-}
+})

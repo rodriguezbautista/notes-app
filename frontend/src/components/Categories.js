@@ -38,33 +38,31 @@ export default function Categories({categories, setCategories, status, edit = fa
        </div>
       </>
       }
-      {
-        !modal &&
-        <span className="note__status">{status}</span>
-      }
-      <ul className="categories__list">
-        {!!categories?.length &&
-          categories.map(c => {
-            return (
-              <li key={c} className="category">
-                {
-                  edit ?
-                  <button
-                  className="category__btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    removeCategory(c);
-                  }}>
+      {!!categories?.length &&
+        <ul className="categories__list">
+          {
+            categories.map(c => {
+              return (
+                <li key={c} className="category">
+                  {
+                    edit ?
+                    <button
+                    className="category__btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      removeCategory(c);
+                    }}>
+                    <span>{c}</span>
+                    <img src="/xmark-icon.svg" alt="Delete category" className="icon action__icon"/>
+                  </button>
+                  :
                   <span>{c}</span>
-                  <img src="/xmark-icon.svg" alt="Delete category" className="icon action__icon"/>
-                </button>
-                :
-                <span>{c}</span>
-                }
-              </li>
-            )})
-          }     
-      </ul>
+                  }
+                </li>
+              )})
+          }
+        </ul>
+      }     
     </div>
   )
 }
