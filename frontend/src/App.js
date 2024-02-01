@@ -13,13 +13,12 @@ function App() {
       credentials: 'include'
     })
       .then(res => {
-        if (!res.ok){
-          throw new Error('User not logged')
+        if (res.ok){
+          setIsLogged(true)
         }
-        setIsLogged(true)
       })
-      .catch(err => console.log(err));
-  }, [setIsLogged])
+
+  }, [isLogged, setIsLogged])
 
   function logout(){
     fetch(url + '/logout', {

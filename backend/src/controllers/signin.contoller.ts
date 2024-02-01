@@ -17,7 +17,7 @@ export class SigninController {
 
       response.appendHeader('Set-Cookie', `token=${token}; httponly; SameSite=None; Secure`)
       response.appendHeader('Set-Cookie', `user=${username}; httponly; SameSite=None; Secure`)
-
+ 
       return response.status(201).send(username);
     } catch(err){
       return response.status(409).json(`${err.meta.target[0]} is already taken`)

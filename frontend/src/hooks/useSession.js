@@ -9,7 +9,7 @@ export function useSession () {
 }
 
 export function SessionProvider ({ children }) {
-  const [session, setSession] = useState('')
+  const [session, setSession] = useState(false)
   return (
     <SessionContext.Provider value={session}>
       <SetSessionContext.Provider value={setSession}>

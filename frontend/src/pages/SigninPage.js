@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import url from '../utils/apiUrl'
+import { useSession } from "../hooks/useSession";
 
 export default function SigninPage(){
   const [registerError, setRegisterError] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [, setIsLogged] = useSession();
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
@@ -31,6 +33,7 @@ export default function SigninPage(){
       const response = await signin(username, password);
       if (!response.ok)
         throw new Error(await response.json());
+      setIsLogged(true);
       navigate('/');
     } catch (err) {
       console.log(err);
