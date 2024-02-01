@@ -21,7 +21,7 @@ export default function SigninPage(){
         username,
         password
       }),
-      credentials: true
+      credentials: 'include'
     });
   }
   
@@ -31,7 +31,7 @@ export default function SigninPage(){
       await signin(username, password);
       redirect('/login');
     } catch (err) {
-      setRegisterError(err);
+      setRegisterError(err.name + ' ' + err.message);
     }
   }
 
