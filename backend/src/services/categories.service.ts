@@ -27,11 +27,9 @@ export class CategoriesService{
     })
   }
 
-  async deleteCategory(id: number): Promise<Categories> {
+  async deleteCategory(where: Prisma.CategoriesWhereUniqueInput): Promise<Categories> {
     return this.prisma.categories.delete({
-      where: {
-        id
-      }
+      where,
     });
   }
 

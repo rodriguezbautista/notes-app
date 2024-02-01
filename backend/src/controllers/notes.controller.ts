@@ -73,9 +73,9 @@ export class NotesController {
         const erasedCategories = currentCategories.filter(c => !categories.some(curr => curr.category === c.category));
         
         erasedCategories.forEach(async category => {
-          await this.categoriesService.deleteCategory(
-              Number(category.id)
-            )
+          await this.categoriesService.deleteCategory({
+              id: category.id
+            })
         });
       }
 
