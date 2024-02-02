@@ -28,8 +28,7 @@ export default function NotesPage(){
       setNoteList(res);
       setIsLoading(false);
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
       setIsLoading(false)
       setNoteList([]);
     });

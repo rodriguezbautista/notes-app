@@ -6,6 +6,10 @@
   margin: 0;
 }
 
+html,body{
+  overflow-x: hidden;
+}
+
 #root{
   --background: #fcfafb;
   --primary: #9e6c86;
@@ -129,13 +133,11 @@ header{
 /* Notes */
 
 .notes__header{
-  --cols: 3;
   display: none;
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 1rem ;
-
 
   &.open{
     display: flex;
@@ -442,13 +444,5 @@ input[type=text], input[type=password]{
 @media (max-width: 964px) {
   .notes{
     --notes-max-width: 458.67px;
-  }
-
-  .notes__header{
-    --cols: 1;
-    margin-bottom: 0;
-    & > *{
-      margin: auto;
-    }
   }
 }
