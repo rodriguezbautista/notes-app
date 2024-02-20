@@ -1,84 +1,86 @@
 /* Layout */
 
-*{
+* {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
-html,body{
+html,
+body {
   overflow-x: hidden;
 }
 
-#root{
+#root {
   --background: #fcfafb;
   --primary: #9e6c86;
   --secondary: #c8beac;
-  --accent: #00C9AE;
+  --accent: #00c9ae;
   --max-width: 1440px;
 
   min-height: 100svh;
   background-color: var(--background);
 }
 
-ul{
+ul {
   list-style: none;
 }
 
-a, .navbar-btn{
+a,
+.navbar-btn {
   text-decoration: none;
   color: inherit;
 
-  &:hover{
+  &:hover {
     opacity: 0.4;
     transition: opacity 0.3s ease;
   }
 }
 
-button{
+button {
   font-size: unset;
   border: none;
   width: max-content;
   text-wrap: nowrap;
   padding: 0.5rem;
-  
-  &:hover{
+
+  &:hover {
     cursor: pointer;
   }
-  
-  &.primary{
+
+  &.primary {
     border-radius: 0.25rem;
     background-color: var(--primary);
     color: white;
 
-    &:hover{
+    &:hover {
       opacity: 0.8;
     }
   }
-  
-  &.primary-btn{
+
+  &.primary-btn {
     font-size: 24px;
-  }  
+  }
 }
 
-textarea{
+textarea {
   font: inherit;
   resize: none;
   border: 1px solid grey;
   padding: 0.25rem;
   width: 100%;
   border-radius: 0.25rem;
-  
-  &:focus{
+
+  &:focus {
     outline: 1px solid grey;
   }
 }
 
-h1{
+h1 {
   font-size: 64px;
 }
 
-header{
+header {
   position: sticky;
   width: 100%;
   border-bottom: 2px solid lightgrey;
@@ -87,41 +89,42 @@ header{
   z-index: 1;
 }
 
-.header__navbar{
+.header__navbar {
   display: flex;
   margin: auto;
   max-width: var(--max-width);
   justify-content: flex-end;
 }
 
-.header__title{
+.header__title {
   margin-right: auto;
 }
 
-.icon{
+.icon {
   filter: invert(100%);
   vertical-align: sub;
 }
 
-.app{
+.app {
   position: relative;
   max-width: var(--max-width);
   margin-inline: auto;
   min-height: calc(100svh - 66px);
 }
 
-.login-link{
+.login-link {
   display: inline-block;
   color: var(--primary);
   text-decoration: underline;
   margin: auto;
 }
 
-.session-btn, .header__navbar > *{
-  padding: 1rem; 
+.session-btn,
+.header__navbar > * {
+  padding: 1rem;
 }
 
-.container{
+.container {
   display: grid;
   width: 100%;
   max-width: var(--max-width);
@@ -132,19 +135,19 @@ header{
 
 /* Notes */
 
-.notes__header{
+.notes__header {
   display: none;
   flex-wrap: wrap-reverse;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 1rem ;
+  gap: 1rem;
 
-  &.open{
+  &.open {
     display: flex;
   }
 }
 
-.notes__status{
+.notes__status {
   display: flex;
   width: max-content;
 
@@ -153,68 +156,68 @@ header{
   outline: 2px solid lightgrey;
   overflow: hidden;
 
-  & button{
+  & button {
     padding: 0.75rem 1rem;
     outline: 1px solid lightgrey;
     text-align: center;
     width: 100%;
-    
-    &:active{
+
+    &:active {
       background-color: var(--accent);
-      background-image: linear-gradient(rgb(0 0 0/10%) 0 0);      
+      background-image: linear-gradient(rgb(0 0 0/10%) 0 0);
     }
   }
 
-  & .active{
+  & .active {
     background-color: var(--accent);
   }
 }
 
-.notes__filter{
+.notes__filter {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.filter__button{
+.filter__button {
   display: flex;
   border: 2px solid grey;
   border-radius: 0.75rem;
 }
 
-.filter__input{
+.filter__input {
   width: 40ch;
   border-radius: 50vw;
 }
 
-.filter__list{
+.filter__list {
   display: flex;
   flex-wrap: wrap;
   width: min-content;
   gap: 0.5rem;
 }
 
-.filter__wrapper{
+.filter__wrapper {
   display: flex;
 
-  & *{
+  & * {
     text-wrap: nowrap;
   }
 }
 
-.filter{
+.filter {
   padding: 0.5rem;
   background-color: lightgrey;
   border-radius: 0.5rem;
 
-  &.active{
+  &.active {
     background-color: black;
     color: white;
     font-weight: bold;
   }
 }
 
-.notes{
+.notes {
   --notes-max-width: 1408px;
   margin-inline: auto;
   display: flex;
@@ -226,7 +229,7 @@ header{
   gap: 1rem;
 }
 
-.notes__add-btn{
+.notes__add-btn {
   position: sticky;
   display: flex;
   align-items: center;
@@ -234,79 +237,79 @@ header{
   bottom: 2rem;
 }
 
-.notes__add-btn__icon{
+.notes__add-btn__icon {
   width: 1.5rem;
   margin-right: 0.25rem;
 }
 
-.note__wrapper{
+.note__wrapper {
   width: 100%;
   max-width: 458.67px;
 }
 
-.note{
+.note {
   display: flex;
   flex-direction: column;
   position: relative;
   gap: 2rem;
   padding: 0.5rem;
+  background-color: rgb(246 245 170);
 
   border: 2px solid lightgrey;
   border-radius: 1rem;
 }
 
-.note__actions-btn{
+.note__actions-btn {
   padding: 0.25rem 0.75rem;
   margin-left: auto;
 }
 
-.note__actions{
+.note__actions {
   position: absolute;
   z-index: 10;
   left: 100%;
   top: -2px;
-  
-  visibility: hidden; 
+
+  visibility: hidden;
   overflow: hidden;
-  
+
   display: flex;
   flex-direction: column;
-  
+
   margin-left: 1rem;
   background-color: var(--background);
   border: 2px solid lightgrey;
   border-radius: 1rem;
   box-shadow: 0 0 2rem rgba(0, 0, 0, 0.3);
 
-
-  &.opened{
+  &.opened {
     visibility: visible;
   }
 
-  & button{
+  & button {
     width: 100%;
   }
 
-  & > :not(:last-child){
+  & > :not(:last-child) {
     border-bottom: 2px solid lightgrey;
   }
 }
 
-.note__action{
+.note__action {
   display: flex;
   justify-content: flex-start;
   gap: 0.25rem;
 
-  &:hover{
+  &:hover {
     background-color: var(--accent);
   }
 }
 
-.action__icon{
+.action__icon {
   width: 1rem;
 }
 
-.note__categories{
+.note__categories {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -318,131 +321,133 @@ header{
   gap: 0.25rem;
 }
 
-.category{
+.category {
   display: flex;
   align-items: center;
   padding: 0.25rem 0.5rem;
   background-color: var(--accent);
   border-radius: 100vw;
-  & > *{
+  & > * {
     color: white;
     font: unset;
   }
 }
 
-.category__btn{
+.category__btn {
   background-color: inherit;
-  
-  & > img{
+
+  & > img {
     width: 1.125rem;
     height: auto;
     vertical-align: middle;
   }
 }
 
-.note__content{
+.note__content {
   width: 100%;
   border-radius: 0.75rem 0.75rem 0 0;
   border-bottom: 1px solid lightgrey;
   overflow: hidden;
 
-  & > *{
+  & > * {
     padding: 0.5rem;
   }
-  
-  & > :not(.note__created-at){
+
+  & > :not(.note__created-at) {
     font-size: 24px;
     border: none;
   }
 
-  & > textarea{
+  & > textarea {
     outline: solid 2px lightgrey;
 
-    &:focus{
+    &:focus {
       outline: solid 2px grey;
     }
   }
 }
 
-.note__header{
+.note__header {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 
-  &::before{
+  &::before {
     content: "";
   }
 }
 
-.note__created-at{
+.note__created-at {
   width: max-content;
 }
 
 /* Forms */
 
-form{
+form {
   display: flex;
   flex-direction: column;
 }
 
-.session__form, .modal__form{
+.session__form,
+.modal__form {
   width: 480px;
   margin: auto;
   padding: 1rem;
 
-  gap: 	1rem;
-  
+  gap: 1rem;
+
   border-radius: 1rem;
   border: 2px solid lightgrey;
 }
 
-.modal__form .note__info{
+.modal__form .note__info {
   flex-direction: row;
   width: 100%;
 }
 
-input[type=text], input[type=password]{
+input[type="text"],
+input[type="password"] {
   padding: 0.75rem 0.5rem;
-  
+
   border: 1px solid grey;
   border-radius: 0.75rem;
-  
-  &.session__input{
+
+  &.session__input {
     line-height: 1.25;
   }
 
-  &:focus{
+  &:focus {
     outline: 1px solid grey;
   }
 }
 
-.edit-form{
+.edit-form {
   gap: 0.5rem;
 }
 
-.form__label{
+.form__label {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-.modal__container{
+.modal__container {
   margin: auto;
   border: none;
   border-radius: 1rem;
 
-  &::backdrop{
+  &::backdrop {
     background-color: rgba(0, 0, 0, 0.3);
   }
 }
 
-@media (min-width: 965px) and (max-width: 1439px){
-  .notes{
+@media (min-width: 965px) and (max-width: 1439px) {
+  .notes {
     --notes-max-width: 933.34px;
   }
 }
 
 @media (max-width: 964px) {
-  .notes{
+  .notes {
     --notes-max-width: 458.67px;
   }
 }
