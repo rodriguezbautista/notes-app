@@ -22,7 +22,7 @@ export class NotesController {
   ) {}
 
   @Get()
-  async getNotes(
+  async getUserNotes(
     @Req() request: Request,
     @Res() response: Response,
   ): Promise<Response | null> {
@@ -42,14 +42,14 @@ export class NotesController {
   }
 
   @Get('/:id')
-  async getNoteById(
+  async getUserNoteById(
     @Req() request: Request,
     @Param('id') id: string,
     @Res() response: Response,
   ): Promise<Response | null> {
     try {
       const user = request.cookies.user;
-      const notes = await this.notesService.getNotes({
+      const notes = await this.notesService.getNote({
         authorId: user,
         id: Number(id),
       });
@@ -88,7 +88,7 @@ export class NotesController {
 
   @Patch('/:id')
   async edit(
-    @Body() body: Prisma.NotesUpdateInput | any,
+    @Body() body: Prisma.NotesUpdateInput,
     @Param('id') id: string,
     @Res() response: Response,
   ): Promise<Response | null> {
@@ -102,12 +102,11 @@ export class NotesController {
           categories: {
             deleteMany: {
               category: {
-                notIn: categories,
+                notIn: categories as string[],
               },
             },
             createMany: {
-              data: categories.map((c: string) => ({ category: c })),
-              skipDuplicates: true,
+              data: (categories as string[]).map((c) => ({ category: c })),
             },
           },
         },

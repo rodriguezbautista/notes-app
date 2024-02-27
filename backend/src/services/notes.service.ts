@@ -9,17 +9,9 @@ export class NotesService {
   async getNote(
     notesWhereUniqueInput: Prisma.NotesWhereUniqueInput,
   ): Promise<Notes | null> {
-    return this.prisma.notes.findUnique({
-      where: notesWhereUniqueInput,
-    });
-  }
-
-  async getNotes(
-    notesWhereInput: Prisma.NotesWhereInput,
-  ): Promise<Notes[] | null> {
     return this.prisma.notes
-      .findMany({
-        where: notesWhereInput,
+      .findUnique({
+        where: notesWhereUniqueInput,
         include: {
           categories: {
             select: {
@@ -28,15 +20,34 @@ export class NotesService {
           },
         },
       })
-      .then((res) =>
-        res
-          .map((note) => {
-            return {
-              ...note,
-              categories: note.categories.map((c) => c.category),
-            };
-          })
-          .sort((a, b) => (a.lastModified > b.lastModified ? -1 : 1)),
+      .then((note) => ({
+        ...note,
+        categories: note.categories.map((c) => c.category),
+      }));
+  }
+
+  async getNotes(
+    notesWhereInput: Prisma.NotesWhereInput,
+  ): Promise<Notes[] | null> {
+    return this.prisma.notes
+      .findMany({
+        where: notesWhereInput,
+        orderBy: {
+          lastModified: 'desc',
+        },
+        include: {
+          categories: {
+            select: {
+              category: true,
+            },
+          },
+        },
+      })
+      .then((notes) =>
+        notes.map((note) => ({
+          ...note,
+          categories: note.categories.map((c) => c.category),
+        })),
       );
   }
 
@@ -52,17 +63,22 @@ export class NotesService {
   }): Promise<Notes> {
     const { where, data } = params;
 
-    return this.prisma.notes.update({
-      data,
-      where,
-      include: {
-        categories: {
-          select: {
-            category: true,
+    return this.prisma.notes
+      .update({
+        data,
+        where,
+        include: {
+          categories: {
+            select: {
+              category: true,
+            },
           },
         },
-      },
-    });
+      })
+      .then((note) => ({
+        ...note,
+        categories: note.categories.map((c) => c.category),
+      }));
   }
 
   async deleteNote(where: Prisma.NotesWhereUniqueInput | any): Promise<Notes> {
