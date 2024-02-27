@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 
-export default function Categories({ categories, setCategories, edit = false }) {
+interface CategoriesProps {
+  categories: string[];
+  edit?: boolean;
+  setCategories: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+export default function Categories({ categories, setCategories, edit = false }: CategoriesProps) {
   const [category, setCategory] = useState<string>("");
 
   function addCategory(e) {
@@ -15,7 +21,7 @@ export default function Categories({ categories, setCategories, edit = false }) 
   }
 
   return (
-    <div className="note__categories">
+    <>
       {edit && (
         <>
           <div>
@@ -68,6 +74,6 @@ export default function Categories({ categories, setCategories, edit = false }) 
           })}
         </ul>
       )}
-    </div>
+    </>
   );
 }

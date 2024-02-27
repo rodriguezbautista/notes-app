@@ -1,8 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import url from "../../utils/apiUrl";
+import url from "../utils/apiUrl";
 import React, { useState } from "react";
 
-export default function NoteActions({ id, noteStatus }) {
+interface NoteActionsProps {
+  id: string;
+  status: string;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function NoteActions({ id, status, setIsEditing }: NoteActionsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -28,7 +34,7 @@ export default function NoteActions({ id, noteStatus }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        noteStatus: newStatus,
+        status: newStatus,
       }),
     });
     navigate(0);
@@ -36,14 +42,14 @@ export default function NoteActions({ id, noteStatus }) {
 
   return (
     <>
-      {noteStatus === "active" ? (
+      {status === "active" ? (
         <>
           <button
             onClick={async (e) => {
               e.preventDefault();
               newStatus("inactive");
             }}
-            className="note__action secondary"
+            className="note__action"
           >
             Mark note as Inactive
           </button>
@@ -52,19 +58,19 @@ export default function NoteActions({ id, noteStatus }) {
               e.preventDefault();
               newStatus("archived");
             }}
-            className="note__action secondary"
+            className="note__action"
           >
             Mark note as Archived
           </button>
         </>
-      ) : noteStatus === "inactive" ? (
+      ) : status === "inactive" ? (
         <>
           <button
             onClick={async (e) => {
               e.preventDefault();
               newStatus("active");
             }}
-            className="note__action secondary"
+            className="note__action"
           >
             Mark note as Active
           </button>
@@ -73,7 +79,7 @@ export default function NoteActions({ id, noteStatus }) {
               e.preventDefault();
               newStatus("archived");
             }}
-            className="note__action secondary"
+            className="note__action"
           >
             Mark note as Archived
           </button>
@@ -85,7 +91,7 @@ export default function NoteActions({ id, noteStatus }) {
               e.preventDefault();
               newStatus("active");
             }}
-            className="note__action secondary"
+            className="note__action"
           >
             Mark note as Active
           </button>
@@ -94,25 +100,31 @@ export default function NoteActions({ id, noteStatus }) {
               e.preventDefault();
               newStatus("inactive");
             }}
-            className="note__action secondary"
+            className="note__action"
           >
             Mark note as Inactive
           </button>
         </>
       )}
-      <button className="note__action secondary" disabled={isLoading} onClick={() => {}}>
-        <span>Edit</span>
+      <button
+        className="note__action"
+        disabled={isLoading}
+        onClick={() => {
+          setIsEditing(true);
+        }}
+      >
         <img src="/edit-icon.svg" alt="Note edit button" className="action__icon" />
+        <span>Edit</span>
       </button>
       <button
-        className="note__action secondary"
+        className="note__action"
         disabled={isLoading}
         onClick={async (e) => {
           await deleteNote();
         }}
       >
-        <span>Delete</span>
         <img src="/delete-icon.svg" alt="Note delete button" className="action__icon" />
+        <span>Delete</span>
       </button>
     </>
   );
