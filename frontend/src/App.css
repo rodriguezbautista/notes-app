@@ -6,7 +6,6 @@
   margin: 0;
 }
 
-html,
 body {
   overflow-x: hidden;
   font-family: "Inter", sans-serif;
@@ -14,7 +13,7 @@ body {
 }
 
 #root {
-  --background: #1d2534;
+  --background: #10151f;
   --primary: #418dff;
   --secondary: #cccc75;
   --accent: #e3e300;
@@ -37,22 +36,13 @@ a {
   }
 }
 
-svg {
-  height: auto;
-  color: white;
-
-  & use {
-    color: inherit;
-  }
-}
-
 button {
   font-size: inherit;
   border: none;
   width: max-content;
   text-wrap: nowrap;
   color: white;
-  background-color: var(--secondary);
+  background-color: var(--primary);
 
   &:hover {
     cursor: pointer;
@@ -61,11 +51,10 @@ button {
 
   &.primary {
     color: white;
-    background-color: var(--primary);
   }
 
-  &.secondary {
-    background-color: var(--accent);
+  & img {
+    filter: invert(1);
   }
 }
 
@@ -96,7 +85,6 @@ header {
   width: 100%;
   top: 0;
   background-color: var(--background);
-  filter: brightness(0.8);
   z-index: 1;
 }
 
@@ -168,10 +156,8 @@ header {
   }
 }
 
-.notes__filter {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.status__filter {
+  background-color: #666;
 }
 
 .filter__button {
@@ -180,16 +166,15 @@ header {
   border-radius: 0.75rem;
 }
 
-.filter__input {
-  width: 40ch;
-  border-radius: 50vw;
-}
-
-.filter__list {
+.notes__filter {
   display: flex;
   flex-wrap: wrap;
-  width: min-content;
+  width: 900px;
   gap: 0.5rem;
+
+  & > li {
+    width: min-content;
+  }
 }
 
 .filter__wrapper {
@@ -202,11 +187,11 @@ header {
 
 .filter {
   padding: 0.5rem;
-  background-color: lightgrey;
+  background-color: #666;
   border-radius: 0.5rem;
 
   &.active {
-    background-color: black;
+    background-color: var(--primary);
     color: white;
     font-weight: bold;
   }
@@ -229,7 +214,7 @@ header {
 }
 
 .notes__add-btn {
-  position: fixed;
+  position: sticky;
   display: flex;
   align-items: center;
   margin-left: auto;
@@ -258,7 +243,6 @@ header {
   background-color: #333;
 
   border-radius: 1rem;
-  box-shadow: 2px 2px 8px #12121280;
 }
 
 .note__header {
@@ -293,18 +277,20 @@ header {
 }
 
 .note__actions {
-  position: absolute;
-  z-index: 10;
-  right: -34%;
-  top: 2.25rem;
-  font-size: 1rem;
-
-  visibility: hidden;
-
   display: flex;
   flex-direction: column;
 
+  position: absolute;
+  z-index: 10;
+  right: 1.5rem;
+  top: 2.125rem;
+
+  padding: 0.5rem;
+  background-color: #666;
+  border-radius: 1rem 0 1rem 1rem;
   margin-left: 0.5rem;
+
+  visibility: hidden;
 
   &.opened {
     visibility: visible;
@@ -322,10 +308,11 @@ header {
   &::before {
     content: "";
     position: absolute;
-    top: -6px;
-    left: 8px;
-    transform: rotate(45deg);
-    border: solid 7px #666;
+    top: -0.5rem;
+    right: 0;
+    border: solid 0.5rem transparent;
+    border-bottom-color: #666;
+    border-right-color: #666;
     z-index: -1;
   }
 }
@@ -335,20 +322,18 @@ header {
   justify-content: flex-start;
   gap: 0.25rem;
   padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
   background-color: inherit;
-  background-color: #666;
 
   &:hover {
     filter: brightness(1.1);
   }
+}
 
-  &:first-child {
-    border-radius: 0.5rem 0.5rem 0 0;
-  }
-
-  &:last-child {
-    border-radius: 0 0 0.5rem 0.5rem;
-  }
+.note__action,
+.note__action > span {
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .action__icon {
@@ -357,11 +342,17 @@ header {
 }
 
 .note__content__wrapper {
-  overflow: hidden;
-  max-height: max-content;
+  & .note__content {
+    overflow: hidden;
+    max-height: 1000px;
+    transition: max-height 2s ease;
+    padding-bottom: 2.5rem;
+  }
 
-  &.contracted {
+  &.contracted .note__content {
+    overflow: hidden;
     max-height: 250px;
+    transition: max-height 1.5s ease;
   }
 }
 
@@ -377,25 +368,20 @@ header {
 }
 
 .note__read-more {
+  position: absolute;
+  bottom: 0;
   width: 100%;
   border-radius: 0 0 1rem 1rem;
   font-size: 1.25rem;
-  background: inherit;
+  background: none;
+  backdrop-filter: blur(6px);
   padding-block: 1rem;
-  margin-top: -1rem;
-  color: var(--primary);
+  color: var(--accent);
+  font-weight: 600;
 
   &:hover {
     filter: brightness(1.1);
   }
-}
-
-.contracted + .note__read-more {
-  background: #353535;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
 }
 
 .note__created-at {
@@ -406,8 +392,7 @@ header {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-inline: 1rem;
-  margin-bottom: 1rem;
+  margin: 1rem;
 }
 
 .category {

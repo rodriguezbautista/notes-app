@@ -8,7 +8,7 @@ import url from "../utils/apiUrl.js";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 export default function NotesPage() {
-  const [filteredCategory, setFilterCategories] = useState("");
+  const [filteredCategories, setFilterCategories] = useState<string[]>([]);
   const [filteredState, setFilteredState] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isLogged] = useSession();
@@ -49,7 +49,7 @@ export default function NotesPage() {
               visible={true}
               height="160"
               width="160"
-              color="#4fa94d"
+              color="#cccc75"
               ariaLabel="tail-spin-loading"
               radius="1"
               wrapperStyle={{ paddingTop: "20%", margin: "auto" }}
@@ -60,56 +60,62 @@ export default function NotesPage() {
               {isLogged ? (
                 <>
                   <h1 className="header__title">Dashboard</h1>
-                  <NoteFilters
-                    categoriesList={categoriesList}
-                    setFilterCategories={setFilterCategories}
-                    filteredState={filteredState}
-                    filteredCategory={filteredCategory}
-                    setFilteredState={setFilteredState}
-                  />
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 768: 2, 1000: 3 }}>
-                    <Masonry gutter="1.5rem" className="masonry-wrapper">
-                      {!!noteList &&
-                        noteList
-                          .filter(
-                            (note) => filteredState === "all" || note.status === filteredState
-                          )
-                          .filter(
-                            (note) =>
-                              !filteredCategory.length ||
-                              note.categories.some((category) =>
-                                filteredCategory.includes(category)
-                              )
-                          )
-                          .map(({ id, content, lastModified, categories, status }) => {
-                            return (
-                              <div key={id} className="note__wrapper">
-                                <Note
-                                  key={id}
-                                  id={id}
-                                  content={content}
-                                  lastModified={lastModified}
-                                  categories={categories}
-                                  status={status}
-                                />
-                              </div>
-                            );
-                          })}
-                    </Masonry>
-                  </ResponsiveMasonry>
-                  <button
-                    className="primary primary-btn notes__add-btn"
-                    onClick={() => {
-                      if (modalRef.current) modalRef.current.showModal();
-                    }}
-                  >
-                    <img
-                      src="/add-note-icon.svg"
-                      alt="Add note icon"
-                      className="icon notes__add-btn__icon"
+                  <aside>
+                    <NoteFilters
+                      categoriesList={categoriesList}
+                      filteredCategories={filteredCategories}
+                      setFilterCategories={setFilterCategories}
+                      filteredState={filteredState}
+                      setFilteredState={setFilteredState}
                     />
-                    Add Note
-                  </button>
+                  </aside>
+                  <section>
+                    <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 768: 2, 1000: 3 }}>
+                      <Masonry gutter="1.5rem" className="masonry-wrapper">
+                        {!!noteList &&
+                          noteList
+                            .filter(
+                              (note) => filteredState === "all" || note.status === filteredState
+                            )
+                            .filter(
+                              (note) =>
+                                !filteredCategories.length ||
+                                note.categories.reduce(
+                                  (qty, category) =>
+                                    qty + (filteredCategories.includes(category) ? 1 : 0),
+                                  0
+                                ) === filteredCategories.length
+                            )
+                            .map(({ id, content, lastModified, categories, status }) => {
+                              return (
+                                <div key={id} className="note__wrapper">
+                                  <Note
+                                    key={id}
+                                    id={id}
+                                    content={content}
+                                    lastModified={lastModified}
+                                    categories={categories}
+                                    status={status}
+                                  />
+                                </div>
+                              );
+                            })}
+                      </Masonry>
+                    </ResponsiveMasonry>
+                    <button
+                      className="primary primary-btn notes__add-btn"
+                      onClick={() => {
+                        if (modalRef.current) modalRef.current.showModal();
+                      }}
+                    >
+                      <img
+                        src="/add-note-icon.svg"
+                        alt="Add note icon"
+                        className="icon notes__add-btn__icon"
+                      />
+                      Add Note
+                    </button>
+                  </section>
                   <NoteModal modalRef={modalRef} />
                 </>
               ) : (
@@ -135,7 +141,7 @@ function NoteFilters({
   categoriesList,
   filteredState,
   setFilteredState,
-  filteredCategory,
+  filteredCategories,
   setFilterCategories,
 }) {
   const filtersRef = useRef<HTMLDivElement>(null);
@@ -152,10 +158,10 @@ function NoteFilters({
   function changeFilterCategories(e, category) {
     e.preventDefault();
     setFilterCategories((prev) => {
-      if (prev === category) {
-        return "";
+      if (prev.includes(category)) {
+        return prev.filter((c) => c !== category);
       }
-      return category;
+      return [...prev, category];
     });
   }
 
@@ -165,48 +171,46 @@ function NoteFilters({
         <img className="action__icon" src="/filter-icon.svg" alt="filter icon" />
       </button>
       <div className="notes__header" ref={filtersRef}>
-        <div className="notes__filter">
-          <ul className="filter__list" style={{ display: !categoriesList.length ? "none" : "" }}>
-            {categoriesList.map((category) => {
-              return (
-                <li key={category}>
-                  <button
-                    onClick={(e) => changeFilterCategories(e, category)}
-                    className={`filter${filteredCategory === category ? " active" : ""}`}
-                    id={category}
-                  >
-                    {category}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <ul className="notes__filter" style={{ display: !categoriesList.length ? "none" : "" }}>
+          {categoriesList.map((category) => {
+            return (
+              <li key={category}>
+                <button
+                  onClick={(e) => changeFilterCategories(e, category)}
+                  className={`filter${filteredCategories.includes(category) ? " active" : ""}`}
+                  id={category}
+                >
+                  {category}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
         <div className="notes__status">
           <button
             onClick={(e) => changeFilterState(e, "all")}
-            className={filteredState === "all" ? "active " : ""}
+            className={`status__filter ${filteredState === "all" ? "active " : ""}`}
             id="All"
           >
             All
           </button>
           <button
             onClick={(e) => changeFilterState(e, "active")}
-            className={filteredState === "active" ? "active " : ""}
+            className={`status__filter ${filteredState === "active" ? "active " : ""}`}
             id="Active"
           >
             Active
           </button>
           <button
             onClick={(e) => changeFilterState(e, "inactive")}
-            className={filteredState === "inactive" ? "active " : ""}
+            className={`status__filter ${filteredState === "inactive" ? "active " : ""}`}
             id="Inactive"
           >
             Inactive
           </button>
           <button
             onClick={(e) => changeFilterState(e, "archived")}
-            className={filteredState === "archived" ? "active " : ""}
+            className={`status__filter ${filteredState === "archived" ? "active " : ""}`}
             id="Archived"
           >
             Archived

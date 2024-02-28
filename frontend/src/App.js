@@ -8,14 +8,14 @@ function App() {
   const [isLogged, setIsLogged] = useSession();
 
   useEffect(() => {
-    fetch(url + "/validation", {
+    fetch(url + "/sessionValidation", {
       credentials: "include",
     }).then((res) => {
       if (res.ok) {
         setIsLogged(true);
       }
     });
-  }, [isLogged, setIsLogged]);
+  }, [setIsLogged]);
 
   function logout() {
     fetch(url + "/logout", {

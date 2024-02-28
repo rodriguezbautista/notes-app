@@ -64,10 +64,18 @@ export default function Note({ id, content, lastModified, categories, status }: 
     );
   }
 
+  // tag note as large depending on content height
   useEffect(() => {
     if (contentRef.current?.offsetHeight && contentRef.current?.offsetHeight > 300)
       setIsLarge(true);
   }, []);
+
+  // after opening the note actions, any click outside will close it
+  useEffect(() => {
+    if (actionsOpened) {
+      optionsRef.current?.focus();
+    }
+  }, [actionsOpened]);
 
   return (
     <li className="note">
@@ -77,9 +85,6 @@ export default function Note({ id, content, lastModified, categories, status }: 
           className="note__actions-btn"
           onClick={() => {
             setActionsOpened(!actionsOpened);
-            if (actionsOpened && optionsRef.current) {
-              optionsRef.current.focus();
-            }
           }}
         >
           <img src="" alt="" />
