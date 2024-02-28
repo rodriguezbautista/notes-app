@@ -44,14 +44,14 @@ export class NotesController {
   @Get('/:id')
   async getUserNoteById(
     @Req() request: Request,
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Res() response: Response,
   ): Promise<Response | null> {
     try {
       const user = request.cookies.user;
       const notes = await this.notesService.getNote({
         authorId: user,
-        id: Number(id),
+        id,
       });
 
       if (notes) {
@@ -89,7 +89,7 @@ export class NotesController {
   @Patch('/:id')
   async edit(
     @Body() body: Prisma.NotesUpdateInput,
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Res() response: Response,
   ): Promise<Response | null> {
     try {
@@ -111,7 +111,7 @@ export class NotesController {
           },
         },
         where: {
-          id: Number(id),
+          id,
         },
       });
 
@@ -124,12 +124,12 @@ export class NotesController {
 
   @Delete('/:id')
   async delete(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Res() response: Response,
   ): Promise<Response | null> {
     try {
       await this.notesService.deleteNote({
-        id: Number(id),
+        id,
       });
       return response.status(204).send();
     } catch (err) {
