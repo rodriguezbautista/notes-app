@@ -3,6 +3,7 @@ import Categories from './Categories.tsx';
 import NoteActions from './NoteActions.tsx';
 import { useNavigate } from 'react-router-dom';
 import url from '../utils/apiUrl.js';
+import useAutosizeTextArea from '../hooks/useAutoResize.ts';
 
 export interface NoteProps {
 	id: string;
@@ -29,6 +30,7 @@ export default function Note({
 	const navigate = useNavigate();
 	const optionsRef = useRef<HTMLDivElement>(null);
 	const contentRef = useRef<HTMLParagraphElement>(null);
+	const editingContentRef = useRef<HTMLTextAreaElement>(null);
 
 	const lastModifiedFormatted = new Date(lastModified).toLocaleDateString(
 		'en-US',
@@ -40,6 +42,36 @@ export default function Note({
 			minute: '2-digit',
 		},
 	);
+
+	// tag note as large depending on content height
+	useEffect(() => {
+		if (
+			contentRef.current?.offsetHeight &&
+			contentRef.current?.offsetHeight > 300
+		)
+			setIsLarge(true);
+	}, []);
+
+	useEffect(() => {
+		if (!isEditing) {
+			if (contentRef.current && contentRef.current.parentElement) {
+				if (isReadingMore)
+					contentRef.current.parentElement.style.maxHeight =
+						String(contentRef.current?.offsetHeight + 64) + 'px';
+				else contentRef.current.parentElement.style.maxHeight = '250px';
+			}
+		} else if (editingContentRef.current?.parentElement)
+			editingContentRef.current.parentElement.style.maxHeight = 'none';
+	}, [isReadingMore, isEditing]);
+
+	// after opening the note actions, any click outside will close it
+	useEffect(() => {
+		if (actionsOpened) {
+			optionsRef.current?.focus();
+		}
+	}, [actionsOpened]);
+
+	useAutosizeTextArea(editingContentRef.current, localeContent);
 
 	async function editNote() {
 		try {
@@ -73,31 +105,6 @@ export default function Note({
 		);
 	}
 
-	// tag note as large depending on content height
-	useEffect(() => {
-		if (
-			contentRef.current?.offsetHeight &&
-			contentRef.current?.offsetHeight > 300
-		)
-			setIsLarge(true);
-	}, []);
-
-	useEffect(() => {
-		if (contentRef.current && contentRef.current.parentElement) {
-			if (isReadingMore)
-				contentRef.current.parentElement.style.maxHeight =
-					String(contentRef.current?.offsetHeight + 64) + 'px';
-			else contentRef.current.parentElement.style.maxHeight = '250px';
-		}
-	}, [isReadingMore]);
-
-	// after opening the note actions, any click outside will close it
-	useEffect(() => {
-		if (actionsOpened) {
-			optionsRef.current?.focus();
-		}
-	}, [actionsOpened]);
-
 	return (
 		<li className="note">
 			<div className="note__header">
@@ -112,12 +119,19 @@ export default function Note({
 				</button>
 				<div
 					ref={optionsRef}
-					className={`note__actions${+actionsOpened ? ' opened' : ''}`}
+					className={`note__actions${actionsOpened ? ' opened' : ''}`}
 					tabIndex={0}
 					style={{ visibility: actionsOpened ? 'visible' : 'hidden' }}
 					onBlur={e => {
-						if (e.currentTarget !== e.relatedTarget?.parentElement)
+						if (
+							e.currentTarget !== e.relatedTarget &&
+							e.currentTarget !== e.relatedTarget?.parentElement
+						) {
 							setActionsOpened(false);
+						}
+						e.relatedTarget?.addEventListener('onclick', () => {
+							setActionsOpened(false);
+						});
 					}}>
 					<NoteActions status={status} id={id} setIsEditing={setIsEditing} />
 				</div>
@@ -126,23 +140,37 @@ export default function Note({
 				className={`note__content__wrapper${
 					isLarge ? (isReadingMore ? ' expanded' : ' contracted') : ''
 				}`}>
-				<p ref={contentRef} className={`note__content`}>
-					{content}
-				</p>
-				{!isLarge ? (
-					<></>
-				) : isReadingMore ? (
-					<button
-						className="note__read-more"
-						onClick={() => setIsReadingMore(!isReadingMore)}>
-						Read Less...
-					</button>
+				{isEditing ? (
+					<textarea
+						ref={editingContentRef}
+						className={`note__content`}
+						value={localeContent}
+						onChange={e => {
+							console.log(contentRef.current?.innerText);
+							setLocaleContent(e.currentTarget.value);
+						}}
+					/>
 				) : (
-					<button
-						className="note__read-more"
-						onClick={() => setIsReadingMore(!isReadingMore)}>
-						Read More...
-					</button>
+					<>
+						<p ref={contentRef} className={`note__content`}>
+							{content}
+						</p>
+						{!isLarge ? (
+							<></>
+						) : isReadingMore ? (
+							<button
+								className="note__read-more"
+								onClick={() => setIsReadingMore(!isReadingMore)}>
+								Read Less...
+							</button>
+						) : (
+							<button
+								className="note__read-more"
+								onClick={() => setIsReadingMore(!isReadingMore)}>
+								Read More...
+							</button>
+						)}
+					</>
 				)}
 			</div>
 			{!!categories.length && (
@@ -152,7 +180,7 @@ export default function Note({
 				/>
 			)}
 			{isEditing && (
-				<>
+				<div>
 					<button
 						className="note__action primary"
 						// button is only disabled when content and category list hasnt changed
@@ -187,7 +215,7 @@ export default function Note({
 							className="icon action__icon"
 						/>
 					</button>
-				</>
+				</div>
 			)}
 		</li>
 	);

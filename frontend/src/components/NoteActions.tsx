@@ -49,16 +49,14 @@ export default function NoteActions({
 			{status === 'active' ? (
 				<>
 					<button
-						onClick={async e => {
-							e.preventDefault();
+						onClick={async () => {
 							newStatus('inactive');
 						}}
 						className="note__action">
 						Mark note as Inactive
 					</button>
 					<button
-						onClick={async e => {
-							e.preventDefault();
+						onClick={async () => {
 							newStatus('archived');
 						}}
 						className="note__action">
@@ -68,16 +66,14 @@ export default function NoteActions({
 			) : status === 'inactive' ? (
 				<>
 					<button
-						onClick={async e => {
-							e.preventDefault();
+						onClick={async () => {
 							newStatus('active');
 						}}
 						className="note__action">
 						Mark note as Active
 					</button>
 					<button
-						onClick={async e => {
-							e.preventDefault();
+						onClick={async () => {
 							newStatus('archived');
 						}}
 						className="note__action">
@@ -87,16 +83,14 @@ export default function NoteActions({
 			) : (
 				<>
 					<button
-						onClick={async e => {
-							e.preventDefault();
+						onClick={async () => {
 							newStatus('active');
 						}}
 						className="note__action">
 						Mark note as Active
 					</button>
 					<button
-						onClick={async e => {
-							e.preventDefault();
+						onClick={async () => {
 							newStatus('inactive');
 						}}
 						className="note__action">
@@ -123,7 +117,7 @@ export default function NoteActions({
 			<button
 				className="note__action"
 				disabled={isLoading}
-				onClick={async e => {
+				onClick={async () => {
 					await deleteNote();
 				}}>
 				<img
