@@ -1,5 +1,3 @@
-/* Layout */
-
 * {
 	box-sizing: border-box;
 	padding: 0;
@@ -7,7 +5,6 @@
 }
 
 body {
-	overflow-x: hidden;
 	font-family: 'Inter', sans-serif;
 	color: white;
 }
@@ -18,9 +15,9 @@ body {
 	--secondary: #cccc75;
 	--accent: #e3e300;
 	--max-width: 1440px;
-
 	min-height: 100svh;
 	background-color: var(--background);
+	overflow: hidden;
 }
 
 ul {
@@ -126,8 +123,6 @@ header {
 	gap: 1rem;
 }
 
-/* Notes */
-
 .notes__header {
 	display: none;
 	flex-wrap: wrap-reverse;
@@ -143,7 +138,6 @@ header {
 .notes__status {
 	display: flex;
 	width: max-content;
-
 	border-radius: 2rem;
 	overflow: hidden;
 
@@ -205,9 +199,7 @@ header {
 	display: flex;
 	flex-wrap: wrap;
 	width: min(var(--notes-max-width, 458.67px), 100%);
-
 	padding-block: 1rem;
-
 	gap: 1rem;
 }
 
@@ -216,7 +208,6 @@ header {
 }
 
 .notes__add-btn {
-	position: fixed;
 	display: flex;
 	align-items: center;
 	bottom: 2rem;
@@ -243,7 +234,6 @@ header {
 	width: 100%;
 	background-color: #333;
 	gap: 1rem;
-
 	border-radius: 1rem;
 
 	& > :last-child {
@@ -289,17 +279,14 @@ header {
 .note__actions {
 	display: flex;
 	flex-direction: column;
-
 	position: absolute;
 	z-index: 10;
 	right: 1.5rem;
 	top: 2.125rem;
-
 	padding: 0.5rem;
 	background-color: #666;
 	border-radius: 1rem 0 1rem 1rem;
 	margin-left: 0.5rem;
-
 	visibility: hidden;
 
 	&.opened {
@@ -428,8 +415,6 @@ header {
 	}
 }
 
-/* Forms */
-
 form {
 	display: flex;
 	flex-direction: column;
@@ -440,9 +425,7 @@ form {
 	width: 480px;
 	margin: auto;
 	padding: 1rem;
-
 	gap: 1rem;
-
 	border-radius: 1rem;
 	border: 2px solid lightgrey;
 }
@@ -455,7 +438,6 @@ form {
 input[type='text'],
 input[type='password'] {
 	padding: 0.75rem 0.5rem;
-
 	border: 1px solid grey;
 	border-radius: 0.75rem;
 

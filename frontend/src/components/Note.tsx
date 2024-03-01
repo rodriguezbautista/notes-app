@@ -62,7 +62,7 @@ export default function Note({
 			}
 		} else if (editingContentRef.current?.parentElement)
 			editingContentRef.current.parentElement.style.maxHeight = 'none';
-	}, [isReadingMore, isEditing]);
+	}, [isReadingMore, isEditing, contentRef.current?.offsetWidth]);
 
 	// after opening the note actions, any click outside will close it
 	useEffect(() => {
