@@ -9,17 +9,12 @@ import {
 	Req,
 	Res,
 } from '@nestjs/common';
-import { NotesService } from '../services/notes.service';
+import { NotesService, NotesWithCategories } from '../services/notes.service';
 import { Response, Request } from 'express';
-import { Prisma } from '@prisma/client';
-import { CategoriesService } from 'src/services/categories.service';
 
 @Controller('/notes')
 export class NotesController {
-	constructor(
-		private readonly notesService: NotesService,
-		private readonly categoriesService: CategoriesService,
-	) {}
+	constructor(private readonly notesService: NotesService) {}
 
 	@Get()
 	async getUserNotes(
@@ -68,7 +63,7 @@ export class NotesController {
 	@Post()
 	async post(
 		@Req() request: Request,
-		@Body() body: Prisma.NotesCreateInput,
+		@Body() body: NotesWithCategories,
 		@Res() response: Response,
 	): Promise<Response | null> {
 		try {
@@ -88,31 +83,16 @@ export class NotesController {
 
 	@Patch('/:id')
 	async edit(
-		@Body() body: Prisma.NotesUpdateInput,
+		@Req() request: Request,
+		@Body() body: NotesWithCategories,
 		@Param('id') id: string,
 		@Res() response: Response,
 	): Promise<Response | null> {
 		try {
-			const { content, status, categories } = body;
-
+			const authorId = request.cookies.user;
 			const post = await this.notesService.updateNote({
-				data: {
-					content,
-					status,
-					categories: {
-						deleteMany: {
-							category: {
-								notIn: categories as string[],
-							},
-						},
-						createMany: {
-							data: (categories as string[])?.map(c => ({ category: c })),
-						},
-					},
-				},
-				where: {
-					id: Number(id),
-				},
+				where: { id: Number(id), authorId },
+				data: body,
 			});
 
 			return response.json(post);
