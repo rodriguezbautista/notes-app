@@ -92,6 +92,14 @@ export class NotesService {
 			// });
 		}
 
+		if (data.status) {
+			await this.prisma.$executeRaw`
+			UPDATE "Notes"
+			SET status = ${data.status}
+			WHERE id = ${where.id}
+			`;
+		}
+
 		return 1;
 	}
 
