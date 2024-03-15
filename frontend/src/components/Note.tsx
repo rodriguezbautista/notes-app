@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Categories from './Categories.tsx';
 import NoteActions from './NoteActions.tsx';
-import { useNavigate } from 'react-router-dom';
 import url from '../utils/apiUrl.js';
-import useAutosizeTextArea from '../hooks/useAutoResize.ts';
 
 export interface NoteProps {
 	id: string;
@@ -11,6 +9,7 @@ export interface NoteProps {
 	lastModified: string;
 	categories: string[];
 	status: string;
+	categoriesList: string[];
 }
 
 export default function Note({
@@ -19,15 +18,15 @@ export default function Note({
 	lastModified,
 	categories,
 	status,
+	categoriesList,
 }: NoteProps) {
 	const [actionsOpened, setActionsOpened] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLarge, setIsLarge] = useState(false);
-	const [isReadingMore, setIsReadingMore] = useState(false);
+	const [isExpanded, setIsExpanded] = useState(false);
 	const [localeContent, setLocaleContent] = useState(content);
 	const [localeCategories, setLocaleCategories] = useState(categories);
-	const navigate = useNavigate();
 	const optionsRef = useRef<HTMLDivElement>(null);
 	const contentRef = useRef<HTMLParagraphElement>(null);
 	const editingContentRef = useRef<HTMLTextAreaElement>(null);
@@ -52,17 +51,29 @@ export default function Note({
 			setIsLarge(true);
 	}, []);
 
+	// Handle the note content height
 	useEffect(() => {
 		if (!isEditing) {
-			if (contentRef.current && contentRef.current.parentElement) {
-				if (isReadingMore)
-					contentRef.current.parentElement.style.maxHeight =
-						String(contentRef.current?.offsetHeight + 64) + 'px';
-				else contentRef.current.parentElement.style.maxHeight = '250px';
+			if (contentRef.current?.parentElement) {
+				if (isExpanded) {
+					window.addEventListener('resize', () => {
+						if (contentRef.current?.parentElement) {
+							contentRef.current.parentElement.style.maxHeight =
+								String(contentRef.current?.offsetHeight + 64) + 'px';
+						}
+					});
+					if (contentRef.current?.parentElement) {
+						contentRef.current.parentElement.style.maxHeight =
+							String(contentRef.current?.offsetHeight + 64) + 'px';
+					}
+				} else contentRef.current.parentElement.style.maxHeight = '350px';
 			}
-		} else if (editingContentRef.current?.parentElement)
-			editingContentRef.current.parentElement.style.maxHeight = 'none';
-	}, [isReadingMore, isEditing, contentRef.current?.offsetWidth]);
+		} else {
+			if (editingContentRef.current?.parentElement) {
+				editingContentRef.current.parentElement.style.maxHeight = '350px';
+			}
+		}
+	}, [isExpanded, isEditing]);
 
 	// after opening the note actions, any click outside will close it
 	useEffect(() => {
@@ -71,7 +82,19 @@ export default function Note({
 		}
 	}, [actionsOpened]);
 
-	useAutosizeTextArea(editingContentRef.current, localeContent);
+	// auto resize the textarea based on content
+	useEffect(() => {
+		window.addEventListener('resize', () => {
+			if (editingContentRef.current) {
+				editingContentRef.current.style.height = `auto`;
+				editingContentRef.current.style.height = `${editingContentRef.current.scrollHeight}px`;
+			}
+		});
+		if (editingContentRef.current) {
+			editingContentRef.current.style.height = `auto`;
+			editingContentRef.current.style.height = `${editingContentRef.current.scrollHeight}px`;
+		}
+	}, [isEditing, localeContent]);
 
 	async function editNote() {
 		try {
@@ -83,15 +106,14 @@ export default function Note({
 				},
 				credentials: 'include',
 				body: JSON.stringify({
-					content: localeContent,
-					categories: localeCategories.map(c => {
-						return { category: c };
-					}),
+					content: localeContent !== content ? localeContent : null,
+					categories: !compareCategories(categories, localeCategories)
+						? localeCategories
+						: null,
 				}),
 			});
 			setIsLoading(false);
 			if (response.ok) {
-				navigate(0);
 			}
 		} catch (err) {
 			console.log(err);
@@ -110,7 +132,7 @@ export default function Note({
 			<div className="note__header">
 				<span className="note__created-at">{lastModifiedFormatted}</span>
 				<button
-					className="note__actions-btn"
+					className="actions__modal-btn"
 					onClick={() => {
 						setActionsOpened(!actionsOpened);
 					}}>
@@ -119,7 +141,7 @@ export default function Note({
 				</button>
 				<div
 					ref={optionsRef}
-					className={`note__actions${actionsOpened ? ' opened' : ''}`}
+					className={`actions__modal${actionsOpened ? ' opened' : ''}`}
 					tabIndex={0}
 					style={{ visibility: actionsOpened ? 'visible' : 'hidden' }}
 					onBlur={e => {
@@ -136,17 +158,20 @@ export default function Note({
 					<NoteActions status={status} id={id} setIsEditing={setIsEditing} />
 				</div>
 			</div>
+
 			<div
 				className={`note__content__wrapper${
-					isLarge ? (isReadingMore ? ' expanded' : ' contracted') : ''
-				}`}>
+					isLarge ? (isExpanded ? ' expanded' : ' contracted') : ''
+				}${isEditing ? ' editing' : ''}`}>
 				{isEditing ? (
 					<textarea
 						ref={editingContentRef}
-						className={`note__content`}
 						value={localeContent}
+						className={`note__content`}
+						rows={1}
+						autoCorrect="off"
+						spellCheck="false"
 						onChange={e => {
-							console.log(contentRef.current?.innerText);
 							setLocaleContent(e.currentTarget.value);
 						}}
 					/>
@@ -155,34 +180,39 @@ export default function Note({
 						<p ref={contentRef} className={`note__content`}>
 							{content}
 						</p>
-						{!isLarge ? (
-							<></>
-						) : isReadingMore ? (
-							<button
-								className="note__read-more"
-								onClick={() => setIsReadingMore(!isReadingMore)}>
-								Read Less...
-							</button>
-						) : (
-							<button
-								className="note__read-more"
-								onClick={() => setIsReadingMore(!isReadingMore)}>
-								Read More...
-							</button>
-						)}
 					</>
 				)}
 			</div>
+			{isLarge && !isEditing ? (
+				isExpanded ? (
+					<button
+						className="note__read-more"
+						onClick={() => setIsExpanded(!isExpanded)}>
+						Read Less...
+					</button>
+				) : (
+					<button
+						className="note__read-more"
+						onClick={() => setIsExpanded(!isExpanded)}>
+						Read More...
+					</button>
+				)
+			) : (
+				<></>
+			)}
+
 			{!!categories.length && (
 				<Categories
-					categories={categories}
+					edit={isEditing}
+					categories={localeCategories}
 					setCategories={setLocaleCategories}
 				/>
 			)}
+
 			{isEditing && (
-				<div>
+				<div className="note__edit-actions">
 					<button
-						className="note__action primary"
+						className="note__edit-action save"
 						// button is only disabled when content and category list hasnt changed
 						disabled={
 							(content === localeContent &&
@@ -190,30 +220,29 @@ export default function Note({
 							isLoading
 						}
 						onClick={async () => {
-							setLocaleContent(content);
 							setIsEditing(false);
 							await editNote();
 						}}>
-						Save
 						<img
 							src="/check-icon.svg"
 							alt="Submit edit button"
 							className="icon action__icon"
 						/>
+						Save
 					</button>
 					<button
-						className="note__action primary"
+						className="note__edit-action cancel"
 						disabled={isLoading}
 						onClick={() => {
 							setLocaleContent(content);
 							setIsEditing(false);
 						}}>
-						Cancel
 						<img
 							src="/xmark-icon.svg"
 							alt="Submit edit button"
 							className="icon action__icon"
 						/>
+						Cancel
 					</button>
 				</div>
 			)}

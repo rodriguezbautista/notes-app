@@ -98,9 +98,7 @@ export default function NoteActions({
 					</button>
 				</>
 			)}
-			<br />
 			<hr />
-			<br />
 			<button
 				className="note__action"
 				disabled={isLoading}

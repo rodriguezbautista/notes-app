@@ -7,11 +7,13 @@ import useAutosizeTextArea from '../hooks/useAutoResize.ts';
 interface NoteModalProps {
 	modalRef?: React.RefObject<HTMLDialogElement>;
 	editing?: boolean;
+	categoriesList: string[];
 }
 
 export default function NoteModal({
 	modalRef,
 	editing = true,
+	categoriesList,
 }: NoteModalProps) {
 	const [content, setContent] = useState('');
 	const [categories, setCategories] = useState<string[]>([]);
@@ -34,6 +36,20 @@ export default function NoteModal({
 		}
 	}, [textAreaRef]);
 
+	// auto resize the textarea based on content
+	useEffect(() => {
+		window.addEventListener('resize', () => {
+			if (textAreaRef.current) {
+				textAreaRef.current.style.height = `auto`;
+				textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+			}
+		});
+		if (textAreaRef.current) {
+			textAreaRef.current.style.height = `auto`;
+			textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+		}
+	}, [content]);
+
 	async function postNote() {
 		try {
 			setIsLoading(true);
@@ -44,12 +60,8 @@ export default function NoteModal({
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					content: content,
-					categories: {
-						create: categories.map(c => {
-							return { category: c };
-						}),
-					},
+					content,
+					categories,
 				}),
 			});
 			setIsLoading(false);
@@ -66,14 +78,23 @@ export default function NoteModal({
 				if (e.currentTarget === e.relatedTarget) modalRef?.current?.close();
 			}}
 			className="modal__container">
-			<form tabIndex={0} className="modal__form">
+			<form
+				tabIndex={0}
+				className="modal__form"
+				onSubmit={e => e.preventDefault()}>
 				<h2>New Note</h2>
-				<textarea
-					spellCheck={false}
-					value={content}
-					rows={3}
-					onChange={e => setContent(e.target.value)}
-				/>
+				<div className="modal__content__wrapper">
+					<textarea
+						placeholder="Your note here..."
+						className="modal__content"
+						ref={textAreaRef}
+						style={{ paddingBlock: 0 }}
+						spellCheck={false}
+						value={content}
+						rows={1}
+						onChange={e => setContent(e.target.value)}
+					/>
+				</div>
 				<div className="note__info">
 					<Categories
 						categories={categories}
@@ -81,9 +102,11 @@ export default function NoteModal({
 						edit={true}
 					/>
 					<button
-						className="primary"
+						className="primary note__create-btn"
 						disabled={isLoading || !content}
-						onClick={async () => {
+						type="button"
+						onClick={async e => {
+							e.preventDefault();
 							await postNote();
 						}}>
 						Create
