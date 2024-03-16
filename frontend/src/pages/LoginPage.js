@@ -10,26 +10,24 @@ export default function LoginPage() {
 	const [, setIsLogged] = useSession();
 	const navigate = useNavigate();
 
-	async function login(username, password) {
-		await fetch(url + '/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				username,
-				password,
-			}),
-			credentials: 'include',
-		});
-	}
-
 	async function onButtonClick() {
 		try {
 			setLoginError('');
-			await login(username, password);
-			setIsLogged(true);
-			navigate('/notes');
+			const res = await fetch(url + '/login', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					username,
+					password,
+				}),
+				credentials: 'include',
+			});
+			if (res.ok) {
+				setIsLogged(true);
+				navigate('/notes');
+			} else setLoginError('Wrong username or password');
 		} catch (err) {
 			console.log(err);
 			setLoginError(err.name + ' ' + err.message);
