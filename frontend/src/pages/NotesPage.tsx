@@ -17,7 +17,7 @@ export default function NotesPage() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (isLogged)
+		if (isLogged) {
 			fetch(url + '/notes', {
 				credentials: 'include',
 			})
@@ -31,12 +31,12 @@ export default function NotesPage() {
 					setNoteList(res);
 					setIsLoading(false);
 				})
-				.catch(() => {
+				.catch(e => {
 					setIsLoading(false);
 					setNoteList([]);
 				});
-		else navigate('/');
-	});
+		} else navigate('/');
+	}, [isLogged, navigate]);
 
 	const categoriesList = useMemo(
 		() =>
