@@ -9,27 +9,20 @@ import { NotesService } from './services/notes.service';
 import { ValidationService } from './services/validation.service';
 import { ValidationMiddleware } from './middlewares/sessionValidation.middleware';
 import { LogoutController } from './controllers/logout.controller';
-import { CategoriesService } from './services/categories.service';
 
 @Module({
-  imports: [],
-  controllers: [
-    NotesController,
-    LoginController,
-    SigninController,
-    LogoutController,
-    ValidationController,
-  ],
-  providers: [
-    PrismaService,
-    UserService,
-    NotesService,
-    ValidationService,
-    CategoriesService,
-  ],
+	imports: [],
+	controllers: [
+		NotesController,
+		LoginController,
+		SigninController,
+		LogoutController,
+		ValidationController,
+	],
+	providers: [PrismaService, UserService, NotesService, ValidationService],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ValidationMiddleware).forRoutes(NotesController);
-  }
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(ValidationMiddleware).forRoutes(NotesController);
+	}
 }
