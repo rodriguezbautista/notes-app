@@ -9,7 +9,7 @@ export interface NoteProps {
 	lastModified: string;
 	categories: string[];
 	status: string;
-	categoriesList: string[];
+	setNoteList: React.Dispatch<React.SetStateAction<[] | NoteProps[]>>;
 }
 
 export default function Note({
@@ -18,7 +18,7 @@ export default function Note({
 	lastModified,
 	categories,
 	status,
-	categoriesList,
+	setNoteList,
 }: NoteProps) {
 	const [actionsOpened, setActionsOpened] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
@@ -155,7 +155,12 @@ export default function Note({
 							setActionsOpened(false);
 						});
 					}}>
-					<NoteActions status={status} id={id} setIsEditing={setIsEditing} />
+					<NoteActions
+						status={status}
+						id={id}
+						setIsEditing={setIsEditing}
+						setNoteList={setNoteList}
+					/>
 				</div>
 			</div>
 
@@ -235,6 +240,7 @@ export default function Note({
 						disabled={isLoading}
 						onClick={() => {
 							setLocaleContent(content);
+							setLocaleCategories(categories);
 							setIsEditing(false);
 						}}>
 						<img

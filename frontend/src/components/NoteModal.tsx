@@ -3,18 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import url from '../utils/apiUrl';
 import Categories from './Categories.tsx';
 import useAutosizeTextArea from '../hooks/useAutoResize.ts';
+import { NoteProps } from './Note.tsx';
 
 interface NoteModalProps {
 	modalRef?: React.RefObject<HTMLDialogElement>;
-	editing?: boolean;
-	categoriesList: string[];
+	setNoteList: React.Dispatch<React.SetStateAction<[] | NoteProps[]>>;
 }
 
-export default function NoteModal({
-	modalRef,
-	editing = true,
-	categoriesList,
-}: NoteModalProps) {
+export default function NoteModal({ modalRef }: NoteModalProps) {
 	const [content, setContent] = useState('');
 	const [categories, setCategories] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState(false);

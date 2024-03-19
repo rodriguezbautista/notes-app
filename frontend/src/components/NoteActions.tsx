@@ -1,30 +1,33 @@
 import { useNavigate } from 'react-router-dom';
 import url from '../utils/apiUrl';
 import React, { useState } from 'react';
+import { NoteProps } from './Note';
 
 interface NoteActionsProps {
 	id: string;
 	status: string;
 	setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+	setNoteList: React.Dispatch<React.SetStateAction<[] | NoteProps[]>>;
 }
 
 export default function NoteActions({
 	id,
 	status,
 	setIsEditing,
+	setNoteList,
 }: NoteActionsProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
 
-	async function deleteNote() {
+	function deleteNote() {
 		try {
 			setIsLoading(true);
-			await fetch(url + `/notes/${id}`, {
+			setNoteList(prev => prev.filter(note => note.id !== id));
+			fetch(url + `/notes/${id}`, {
 				method: 'DELETE',
 				credentials: 'include',
 			});
 			setIsLoading(false);
-			navigate(0);
 		} catch (err) {
 			console.log(err);
 		}
@@ -41,7 +44,11 @@ export default function NoteActions({
 				status: newStatus,
 			}),
 		});
-		navigate(0);
+		setNoteList(prev =>
+			prev.map(note =>
+				note.id === id ? { ...note, status: newStatus } : note,
+			),
+		);
 	}
 
 	return (

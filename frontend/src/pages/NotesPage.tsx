@@ -112,7 +112,7 @@ export default function NotesPage() {
 																lastModified={lastModified}
 																categories={categories}
 																status={status}
-																categoriesList={categoriesList}
+																setNoteList={setNoteList}
 															/>
 														</div>
 													);
@@ -133,7 +133,7 @@ export default function NotesPage() {
 								Add Note
 							</button>
 						</section>
-						<NoteModal modalRef={modalRef} categoriesList={categoriesList} />
+						<NoteModal modalRef={modalRef} setNoteList={setNoteList} />
 					</>
 				)}
 			</section>
