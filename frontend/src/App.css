@@ -115,10 +115,18 @@ header {
 	align-items: center;
 	justify-content: flex-end;
 	font-size: 20px;
+	height: min-content;
 }
 
 .header__title {
+	margin: 0.75rem;
 	margin-right: auto;
+	height: 24px;
+
+	& img {
+		max-height: 24px;
+		width: 100%;
+	}
 }
 
 .app {
@@ -137,7 +145,7 @@ header {
 }
 
 .session-btn,
-.header__navbar > * {
+.navbar-btn {
 	padding: 0.75rem;
 }
 

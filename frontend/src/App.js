@@ -37,7 +37,7 @@ function App() {
 			<header>
 				<nav className="header__navbar">
 					<Link to={isLogged ? '/notes' : '/'} className="header__title">
-						<span>Note It Down</span>
+						<img src="/logo.png" alt="logo" />
 					</Link>
 					{!isLogged ? (
 						<>
